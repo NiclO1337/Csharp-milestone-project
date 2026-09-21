@@ -93,9 +93,11 @@ Tests ──► Core
 principle: the domain defines `ITransactionRepository`, and `Infrastructure` implements it.
 
 **What the compiler enforces.** `Core` cannot name a type that lives in `Infrastructure` or
-`ConsoleApp`. Writing `new JsonTransactionRepository(...)` or `MainMenu` inside `Core` is a
-CS0246 build error, not a code-review note. The same goes for `Infrastructure` reaching into
-`ConsoleApp`. That is the layering rule made structural.
+`ConsoleApp`. Referring to one is a build error, not a code-review note: CS0246 for a bare type
+name it cannot resolve at all (`JsonTransactionRepository`), CS0234 for a qualified one where
+the outer namespace resolves but the next segment does not
+(`MoneyTracker.Infrastructure.JsonTransactionRepository`). The same goes for `Infrastructure`
+reaching into `ConsoleApp`. That is the layering rule made structural.
 
 **What it does not enforce.** `System.Console` and `System.IO.File` live in the shared
 framework and are visible from every project, `Core` included. "No `Console.*` outside `UI/`"
