@@ -1,0 +1,7 @@
+root = true
+
+[*.cs]
+
+# IDE0290: Use primary constructor — declined project-wide for consistency and readability
+# with Transaction, whose constructor does real validation, not trivial assignment.
+dotnet_diagnostic.IDE0290.severity = none
