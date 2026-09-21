@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MoneyTracker.ConsoleApp/MoneyTracker.ConsoleApp.csproj" />
+    <Project Path="src/MoneyTracker.Core/MoneyTracker.Core.csproj" />
+    <Project Path="src/MoneyTracker.Infrastructure/MoneyTracker.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MoneyTracker.Core.Tests/MoneyTracker.Core.Tests.csproj" />
+  </Folder>
+</Solution>
