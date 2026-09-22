@@ -31,7 +31,7 @@ public sealed class TransactionService
     public IReadOnlyList<Transaction> GetTransactions(
         TransactionFilter filter = TransactionFilter.All,
         SortField sortBy = SortField.Month,
-        SortDirection direction = SortDirection.Ascending)
+        SortDirection direction = SortDirection.Descending)
     {
         IEnumerable<Transaction> filtered = filter switch
         {
@@ -46,8 +46,11 @@ public sealed class TransactionService
             (SortField.Amount, SortDirection.Descending) => filtered.OrderByDescending(t => t.SignedAmount),
             (SortField.Title, SortDirection.Ascending) => filtered.OrderBy(t => t.Title, StringComparer.CurrentCultureIgnoreCase),
             (SortField.Title, SortDirection.Descending) => filtered.OrderByDescending(t => t.Title, StringComparer.CurrentCultureIgnoreCase),
-            (_, SortDirection.Ascending) => filtered.OrderBy(t => t.Month),
-            (_, SortDirection.Descending) => filtered.OrderByDescending(t => t.Month),
+            // ThenByDescending on both branches is deliberate: incomes (positive SignedAmount)
+            // should sort before expenses (negative) within the same month regardless of which
+            // way Month itself is ordered.
+            (_, SortDirection.Ascending) => filtered.OrderBy(t => t.Month).ThenByDescending(t => t.SignedAmount),
+            (_, SortDirection.Descending) => filtered.OrderByDescending(t => t.Month).ThenByDescending(t => t.SignedAmount),
             _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "Unknown sort direction."),
         };
 
