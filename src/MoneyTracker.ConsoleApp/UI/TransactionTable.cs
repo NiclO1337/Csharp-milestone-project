@@ -1,0 +1,74 @@
+using System.Globalization;
+using MoneyTracker.Core.Models;
+
+namespace MoneyTracker.ConsoleApp.UI;
+
+/// <summary>
+/// Renders a list of transactions as a table whose column widths fit the actual data.
+/// Presentation only — no sorting, filtering, or arithmetic; callers pass in exactly what
+/// should be shown.
+/// </summary>
+internal static class TransactionTable
+{
+    private const int ColumnPadding = 3;
+
+    private static readonly CultureInfo s_currency = CultureInfo.GetCultureInfo("sv-SE");
+
+    internal static void Display(IReadOnlyList<Transaction> transactions)
+    {
+        if (transactions.Count == 0)
+        {
+            ConsoleMessage.DisplayWarningMessage("No transactions to show.");
+            return;
+        }
+
+        var rows = transactions.Select(ToRow).ToList();
+        var widths = MeasureColumns(rows);
+        var header = FormatRow(new Row("ID", "Type", "Title", "Month", "Amount"), widths);
+
+        Console.WriteLine();
+        Console.WriteLine(header);
+        Console.WriteLine(new string('-', header.Length - ColumnPadding));
+
+        foreach (var row in rows)
+        {
+            Console.WriteLine(FormatRow(row, widths));
+        }
+
+        Console.WriteLine(new string('-', header.Length - ColumnPadding));
+    }
+
+    private static Row ToRow(Transaction transaction) => new(
+        transaction.Id.ToString(CultureInfo.InvariantCulture),
+        transaction.TypeName,
+        transaction.Title,
+        transaction.Month.ToString(),
+        transaction.SignedAmount.ToString("N2", s_currency));
+
+    private static ColumnWidths MeasureColumns(IReadOnlyList<Row> rows) => new(
+        Id: Math.Max("ID".Length, rows.Max(r => r.Id.Length)) + ColumnPadding,
+        Type: Math.Max("Type".Length, rows.Max(r => r.Type.Length)) + ColumnPadding,
+        Title: Math.Max("Title".Length, rows.Max(r => r.Title.Length)) + ColumnPadding,
+        Month: Math.Max("Month".Length, rows.Max(r => r.Month.Length)) + ColumnPadding,
+        Amount: Math.Max("Amount".Length, rows.Max(r => r.Amount.Length)) + ColumnPadding);
+
+    private static string FormatRow(Row row, ColumnWidths widths) =>
+        PadNumeric(row.Id, widths.Id)
+        + row.Type.PadRight(widths.Type)
+        + row.Title.PadRight(widths.Title)
+        + row.Month.PadRight(widths.Month)
+        + PadNumeric(row.Amount, widths.Amount);
+
+    /// <summary>
+    /// Right-aligns <paramref name="value"/>, then appends the column gap as trailing spaces.
+    /// Plain <see cref="string.PadLeft(int)"/> puts all padding on the left, leaving no gap
+    /// before the next column — unlike <see cref="string.PadRight(int)"/> columns, whose
+    /// padding already trails.
+    /// </summary>
+    private static string PadNumeric(string value, int totalWidth) =>
+        value.PadLeft(totalWidth - ColumnPadding) + new string(' ', ColumnPadding);
+
+    private readonly record struct Row(string Id, string Type, string Title, string Month, string Amount);
+
+    private readonly record struct ColumnWidths(int Id, int Type, int Title, int Month, int Amount);
+}
