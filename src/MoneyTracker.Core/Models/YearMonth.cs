@@ -18,6 +18,9 @@ public readonly record struct YearMonth : IComparable<YearMonth>
     /// <summary>The month component, between 1 and 12.</summary>
     public int Month { get; }
 
+    /// <summary>The current calendar month, from the system clock.</summary>
+    public static YearMonth Current => new(DateTime.Now.Year, DateTime.Now.Month);
+
     /// <summary>
     /// Creates a new <see cref="YearMonth"/>.
     /// </summary>

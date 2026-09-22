@@ -110,7 +110,7 @@ internal sealed class TransactionMenu
     internal void AddExpense() =>
         AddTransaction("Add Expense", (title, amount, month) => _service.AddExpense(title, amount, month));
 
-    private void AddTransaction(string heading, Func<string, decimal, YearMonth, Transaction> add)
+    private static void AddTransaction(string heading, Func<string, decimal, YearMonth, Transaction> add)
     {
         ConsoleMessage.Heading(heading);
 
@@ -121,10 +121,12 @@ internal sealed class TransactionMenu
             "Invalid amount, must be greater than 0.",
             allowCancel: true);
         var month = ConsoleInput.ValidateInput(
-            "Month yyyy-MM (q to cancel): ",
+            "Month yyyy-MM (q to cancel or just press Enter for current month): ",
             ValidateMonth,
             "Invalid month, expected format yyyy-MM.",
-            allowCancel: true);
+            allowCancel: true,
+            hasCurrentValue: true,
+            currentValue: YearMonth.Current);
 
         var transaction = add(title, amount, month);
         ConsoleMessage.DisplaySuccessMessage($"{transaction.TypeName} '{transaction.Title}' added.");
