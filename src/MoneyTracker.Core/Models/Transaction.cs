@@ -31,11 +31,13 @@ public abstract class Transaction
 
     /// <summary>
     /// <see cref="Amount"/> with the sign this transaction type contributes to a balance:
-    /// positive for income, negative for an expense.
+    /// positive for income, negative for an expense. Derived, not stored.
     /// </summary>
+    [JsonIgnore]
     public abstract decimal SignedAmount { get; }
 
-    /// <summary>Display label for this transaction's kind, e.g. "Income" or "Expense".</summary>
+    /// <summary>Display label for this transaction's kind, e.g. "Income" or "Expense". Derived, not stored.</summary>
+    [JsonIgnore]
     public abstract string TypeName { get; }
 
     /// <exception cref="ArgumentException"><paramref name="title"/> is blank or too long.</exception>

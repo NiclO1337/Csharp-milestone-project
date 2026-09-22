@@ -16,8 +16,10 @@ public sealed class Income : Transaction
     }
 
     /// <inheritdoc />
+    [JsonIgnore]
     public override decimal SignedAmount => Amount;
 
     /// <inheritdoc />
+    [JsonIgnore]
     public override string TypeName => "Income";
 }
