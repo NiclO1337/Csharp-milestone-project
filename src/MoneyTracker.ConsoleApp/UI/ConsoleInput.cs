@@ -111,21 +111,38 @@ internal static class ConsoleInput
 
     internal static void DisplayNumberedList(IReadOnlyList<string> items) => DisplayNumberedList(items, item => item);
 
-    internal static T SelectFromList<T>(
-        IReadOnlyList<T> items,
-        Func<T, string> display,
-        string prompt = "Select an option: ",
-        bool allowCancel = false)
+    /// <summary>
+    /// Displays <paramref name="menuItems"/> numbered 1..N plus a reserved "0" option, and
+    /// returns whichever number was chosen. The valid range and the prompt/error text always
+    /// match <paramref name="menuItems"/>'s current length — nothing to keep in sync by hand
+    /// when items are added or removed.
+    /// </summary>
+    internal static int SelectMenuOption(IReadOnlyList<string> menuItems, string zeroLabel)
     {
-        DisplayNumberedList(items, display);
+        DisplayNumberedList(menuItems);
+        Console.WriteLine($"0. {zeroLabel}");
 
-        var choice = ValidateInput(
-            prompt,
-            ValidateIntegerRange(1, items.Count),
-            $"Invalid input, please enter a number between 1 and {items.Count}.",
-            allowCancel);
+        return ValidateInput(
+            $"Select option (0 - {menuItems.Count}): ",
+            ValidateIntegerRange(0, menuItems.Count),
+            $"Invalid input, select a number between 0 and {menuItems.Count}.");
+    }
 
-        return items[choice - 1];
+    /// <summary>
+    /// Lists every value of <typeparamref name="T"/> as a menu, flags <paramref name="current"/>
+    /// as "(current)", and returns the chosen value — or <paramref name="current"/> unchanged if
+    /// "0. Back" was picked.
+    /// </summary>
+    internal static T SelectEnumOption<T>(T current)
+        where T : struct, Enum
+    {
+        var values = Enum.GetValues<T>();
+        var menuItems = values
+            .Select(value => value.Equals(current) ? $"{value} (current)" : value.ToString())
+            .ToArray();
+
+        var choice = SelectMenuOption(menuItems, "Back");
+        return choice == 0 ? current : values[choice - 1];
     }
 
     internal static bool Confirm(string message)
