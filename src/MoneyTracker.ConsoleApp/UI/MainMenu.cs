@@ -38,6 +38,11 @@ internal sealed class MainMenu
 
     private void RunMenuLoop()
     {
+        Console.Write("\nPress any key to continue to main menu...");
+        Console.ForegroundColor = ConsoleColor.Black;
+        Console.ReadKey();
+        Console.ResetColor();
+
         string[] menuItems =
         [
             "Show transactions",

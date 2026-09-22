@@ -33,7 +33,7 @@ internal sealed class TransactionMenu
     {
         var filter = TransactionFilter.All;
         var sortBy = SortField.Month;
-        var direction = SortDirection.Ascending;
+        var direction = SortDirection.Descending;
         var page = 0;
 
         while (true)
@@ -52,7 +52,7 @@ internal sealed class TransactionMenu
                 "Next page\n",
                 $"Change filter (current: {filter})",
                 $"Change sort (current: {sortBy})",
-                $"Change direction (current: {direction})",
+                $"Toggle direction (current: {direction})",
             ];
 
             var choice = ConsoleInput.SelectMenuOption(menuItems, "Back to main menu");
@@ -88,7 +88,8 @@ internal sealed class TransactionMenu
                     (sortBy, page) = ApplyChange(sortBy, page);
                     break;
                 case 5:
-                    (direction, page) = ApplyChange(direction, page);
+                    direction = direction == SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending;
+                    page = 0;
                     break;
                 case 0:
                     return;
@@ -104,17 +105,26 @@ internal sealed class TransactionMenu
         return updated.Equals(current) ? (current, page) : (updated, 0);
     }
 
+    private static readonly string[] s_incomeTitles = ["Salary", "Pension", "Freelance", "Gift", "Bonus"];
+
+    private static readonly string[] s_expenseTitles =
+    [
+        "Rent", "Electricity", "Water", "Internet", "Phone", "Groceries", "Clothing",
+        "Transport", "Insurance", "Subscription", "Dining Out", "Entertainment",
+        "Healthcare", "Gym", "Travel",
+    ];
+
     internal void AddIncome() =>
-        AddTransaction("Add Income", (title, amount, month) => _service.AddIncome(title, amount, month));
+        AddTransaction("Add Income", s_incomeTitles, (title, amount, month) => _service.AddIncome(title, amount, month));
 
     internal void AddExpense() =>
-        AddTransaction("Add Expense", (title, amount, month) => _service.AddExpense(title, amount, month));
+        AddTransaction("Add Expense", s_expenseTitles, (title, amount, month) => _service.AddExpense(title, amount, month));
 
-    private static void AddTransaction(string heading, Func<string, decimal, YearMonth, Transaction> add)
+    private static void AddTransaction(string heading, IReadOnlyList<string> titlePresets, Func<string, decimal, YearMonth, Transaction> add)
     {
         ConsoleMessage.Heading(heading);
 
-        var title = ConsoleInput.ValidateInput("Title (q to cancel): ", Transaction.MaxTitleLength, allowCancel: true);
+        var title = SelectTitle(titlePresets);
         var amount = ConsoleInput.ValidateInput(
             "Amount (q to cancel): ",
             ValidateAmount,
@@ -130,6 +140,21 @@ internal sealed class TransactionMenu
 
         var transaction = add(title, amount, month);
         ConsoleMessage.DisplaySuccessMessage($"{transaction.TypeName} '{transaction.Title}' added.");
+    }
+
+    private static string SelectTitle(IReadOnlyList<string> presets)
+    {
+        var menuItems = presets.Append("Write your own title").ToArray();
+        var choice = ConsoleInput.SelectMenuOption(menuItems, "Cancel");
+
+        if (choice == 0)
+        {
+            throw new UserCancelledException();
+        }
+
+        return choice == menuItems.Length
+            ? ConsoleInput.ValidateInput("Title (q to cancel): ", Transaction.MaxTitleLength, allowCancel: true)
+            : presets[choice - 1];
     }
 
     internal void EditTransaction()
