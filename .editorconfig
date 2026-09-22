@@ -5,3 +5,7 @@ root = true
 # IDE0290: Use primary constructor — declined project-wide for consistency and readability
 # with Transaction, whose constructor does real validation, not trivial assignment.
 dotnet_diagnostic.IDE0290.severity = none
+
+# IDE0305: Use collection expression for fluent — declined; .ToList() reads better than [.. x]
+# at the end of a LINQ chain.
+dotnet_diagnostic.IDE0305.severity = none
