@@ -35,6 +35,7 @@ Console.WriteLine("A treasure-keeper's ledger for tracking your gold:");
 Console.WriteLine("mind your mint, weigh your winnings, spot the coin");
 Console.WriteLine("that got away, and keep your hoard from gathering dust.\n");
 Console.ResetColor();
+ConsoleInput.Pause();
 
 var path = Path.Combine(AppContext.BaseDirectory, "data", "transactions.json");
 var repository = new JsonTransactionRepository(path);

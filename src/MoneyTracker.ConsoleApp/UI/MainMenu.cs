@@ -38,11 +38,6 @@ internal sealed class MainMenu
 
     private void RunMenuLoop()
     {
-        Console.Write("\nPress any key to continue to main menu...");
-        Console.ForegroundColor = ConsoleColor.Black;
-        Console.ReadKey();
-        Console.ResetColor();
-
         string[] menuItems =
         [
             "Show transactions",
@@ -66,22 +61,29 @@ internal sealed class MainMenu
             switch (choice)
             {
                 case 1:
+                    // Only case that skips the pause: returning from "Back to main menu" should
+                    // re-render instantly, not make browsing feel sluggish.
                     _transactionMenu.ShowTransactions();
                     break;
                 case 2:
                     ConsoleInput.TryRun(_transactionMenu.AddIncome);
+                    ConsoleInput.Pause();
                     break;
                 case 3:
                     ConsoleInput.TryRun(_transactionMenu.AddExpense);
+                    ConsoleInput.Pause();
                     break;
                 case 4:
                     ConsoleInput.TryRun(_transactionMenu.EditTransaction);
+                    ConsoleInput.Pause();
                     break;
                 case 5:
                     ConsoleInput.TryRun(_transactionMenu.RemoveTransaction);
+                    ConsoleInput.Pause();
                     break;
                 case 6:
                     ConsoleInput.TryRun(_transactionMenu.ShowMonthlySummary);
+                    ConsoleInput.Pause();
                     break;
                 case 0:
                     return;

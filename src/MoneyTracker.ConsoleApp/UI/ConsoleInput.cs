@@ -145,6 +145,27 @@ internal static class ConsoleInput
         return choice == 0 ? current : values[choice - 1];
     }
 
+    /// <summary>
+    /// Blocks until the user presses a key. Falls back to <see cref="Console.ReadLine"/> when
+    /// input is redirected (piped/scripted input), since <see cref="Console.ReadKey()"/> throws
+    /// <see cref="InvalidOperationException"/> in that case.
+    /// </summary>
+    internal static void Pause()
+    {
+        Console.Write("\nPress any key to continue to main menu...");
+
+        if (Console.IsInputRedirected)
+        {
+            Console.ReadLine();
+        }
+        else
+        {
+            Console.ReadKey(intercept: true);
+        }
+
+        Console.WriteLine();
+    }
+
     internal static bool Confirm(string message)
     {
         ConsoleMessage.DisplayWarningMessage(message);
