@@ -35,6 +35,9 @@ public abstract class Transaction
     /// </summary>
     public abstract decimal SignedAmount { get; }
 
+    /// <summary>Display label for this transaction's kind, e.g. "Income" or "Expense".</summary>
+    public abstract string TypeName { get; }
+
     /// <exception cref="ArgumentException"><paramref name="title"/> is blank or too long.</exception>
     /// <exception cref="ArgumentOutOfRangeException">
     /// <paramref name="amount"/> is not greater than 0 or exceeds <see cref="MaxAmount"/>.
