@@ -55,7 +55,9 @@ internal sealed class MainMenu
 
         while (true)
         {
-            ConsoleMessage.Heading("MoneyTracker");
+            Console.WriteLine("\n\n=============================================");
+            Console.WriteLine("   DRAGON'S LEDGER - MONEY TRACKING SYSTEM");
+            Console.WriteLine("=============================================\n");
             PrintSummary(_service.GetSummary());
             Console.WriteLine();
 
