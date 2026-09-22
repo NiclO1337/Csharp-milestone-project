@@ -2,6 +2,9 @@ using MoneyTracker.ConsoleApp.UI;
 using MoneyTracker.Core.Exceptions;
 using MoneyTracker.Core.Services;
 using MoneyTracker.Infrastructure.Json;
+
+SlowConsole.Install();
+
 Console.ForegroundColor = ConsoleColor.DarkYellow;
 foreach (string line in new[]
 {

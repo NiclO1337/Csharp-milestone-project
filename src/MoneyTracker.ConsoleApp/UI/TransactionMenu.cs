@@ -63,6 +63,7 @@ internal sealed class TransactionMenu
                     if (page == 0)
                     {
                         ConsoleMessage.DisplayWarningMessage("Already on the first page.");
+                        Thread.Sleep(1000);
                     }
                     else
                     {
@@ -74,6 +75,7 @@ internal sealed class TransactionMenu
                     if (page == pageCount - 1)
                     {
                         ConsoleMessage.DisplayWarningMessage("Already on the last page.");
+                        Thread.Sleep(1000);
                     }
                     else
                     {
