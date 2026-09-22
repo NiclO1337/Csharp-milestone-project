@@ -13,6 +13,11 @@ internal static class ConsoleInput
             Console.Write("\n" + prompt);
             var input = Console.ReadLine();
 
+            if (input is null)
+            {
+                throw new UserCancelledException();
+            }
+
             if (allowCancel && IsCancel(input))
             {
                 throw new UserCancelledException();
@@ -51,6 +56,11 @@ internal static class ConsoleInput
         {
             Console.Write("\n" + prompt);
             var input = Console.ReadLine();
+
+            if (input is null)
+            {
+                throw new UserCancelledException();
+            }
 
             if (allowCancel && IsCancel(input))
             {
