@@ -61,8 +61,8 @@ internal sealed class MainMenu
             switch (choice)
             {
                 case 1:
-                    // Only case that skips the pause: returning from "Back to main menu" should
-                    // re-render instantly, not make browsing feel sluggish.
+                    // Skips the pause: menu-driven browsing screen with its own "0. Back to main
+                    // menu" — returning should re-render instantly, not feel sluggish.
                     _transactionMenu.ShowTransactions();
                     break;
                 case 2:
@@ -82,8 +82,8 @@ internal sealed class MainMenu
                     ConsoleInput.Pause();
                     break;
                 case 6:
+                    // Skips the pause: same reasoning as case 1.
                     ConsoleInput.TryRun(_transactionMenu.ShowMonthlySummary);
-                    ConsoleInput.Pause();
                     break;
                 case 0:
                     return;

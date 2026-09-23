@@ -60,6 +60,21 @@ public sealed class TransactionService
     /// <summary>Finds a transaction by ID, or <see langword="null"/> if none exists.</summary>
     public Transaction? FindById(int id) => _transactions.FirstOrDefault(t => t.Id == id);
 
+    /// <summary>
+    /// Returns transactions for a single <paramref name="month"/>, or every transaction if
+    /// <paramref name="month"/> is <see langword="null"/> — sorted the same way as
+    /// <see cref="GetTransactions"/>'s default (most recent month first).
+    /// </summary>
+    public IReadOnlyList<Transaction> GetTransactionsForMonth(YearMonth? month = null)
+    {
+        var transactions = GetTransactions(sortBy: SortField.Month, direction: SortDirection.Descending);
+        return month is null ? transactions : transactions.Where(t => t.Month == month.Value).ToList();
+    }
+
+    /// <summary>Distinct months that have at least one transaction, oldest first.</summary>
+    public IReadOnlyList<YearMonth> GetAvailableMonths() =>
+        _transactions.Select(t => t.Month).Distinct().OrderBy(m => m).ToList();
+
     /// <summary>Adds a new income and persists.</summary>
     /// <exception cref="ArgumentException"><paramref name="title"/> is blank or too long.</exception>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="amount"/> is out of range.</exception>

@@ -242,19 +242,75 @@ internal sealed class TransactionMenu
 
     internal void ShowMonthlySummary()
     {
-        ConsoleMessage.Heading("Monthly Summary");
+        var month = SelectSummaryMonth();
+        var page = 0;
 
-        var month = ConsoleInput.ValidateInput<YearMonth?>(
+        while (true)
+        {
+            var transactions = _service.GetTransactionsForMonth(month);
+            var pageCount = Math.Max(1, (transactions.Count + PageSize - 1) / PageSize);
+
+            ConsoleMessage.Heading("Monthly Summary");
+            Console.WriteLine(month is null ? "All time" : $"{month}");
+            PrintSummary(_service.GetSummary(month));
+            Console.WriteLine();
+            TransactionTable.Display(transactions.Skip(page * PageSize).Take(PageSize).ToList());
+            Console.WriteLine($"\nPage {page + 1} of {pageCount}");
+            Console.WriteLine();
+
+            string[] menuItems =
+            [
+                "Previous page",
+                "Next page\n",
+                "Choose another month",
+            ];
+
+            Dictionary<int, string> disabledChoices = [];
+            if (page == 0)
+            {
+                disabledChoices[1] = "Already on the first page.";
+            }
+
+            if (page == pageCount - 1)
+            {
+                disabledChoices[2] = "Already on the last page.";
+            }
+
+            var choice = ConsoleInput.SelectMenuOption(menuItems, "Back to main menu", disabledChoices);
+
+            switch (choice)
+            {
+                case 1:
+                    page--;
+                    break;
+                case 2:
+                    page++;
+                    break;
+                case 3:
+                    month = SelectSummaryMonth();
+                    page = 0;
+                    break;
+                case 0:
+                    return;
+            }
+        }
+    }
+
+    private YearMonth? SelectSummaryMonth()
+    {
+        var availableMonths = _service.GetAvailableMonths();
+        if (availableMonths.Count > 0)
+        {
+            Console.WriteLine("\nAvailable months: " + string.Join(", ", availableMonths));
+        }
+
+        return ConsoleInput.ValidateInput<YearMonth?>(
             "Month yyyy-MM (Enter for all time, q to cancel): ",
             ValidateOptionalMonth,
             "Invalid month, expected format yyyy-MM.",
             allowCancel: true,
             hasCurrentValue: true,
             currentValue: null);
-
-        Console.WriteLine();
-        Console.WriteLine(month is null ? "All time:" : $"{month}:");
-        PrintSummary(_service.GetSummary(month));
     }
 
     private static void PrintSummary(BalanceSummary summary)
