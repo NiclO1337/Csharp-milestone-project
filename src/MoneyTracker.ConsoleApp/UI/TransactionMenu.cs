@@ -109,17 +109,30 @@ internal sealed class TransactionMenu
         "Healthcare", "Gym", "Travel",
     ];
 
-    internal void AddIncome() =>
+    internal bool AddIncome() =>
         AddTransaction("Add Income", s_incomeTitles, (title, amount, month) => _service.AddIncome(title, amount, month));
 
-    internal void AddExpense() =>
+    internal bool AddExpense() =>
         AddTransaction("Add Expense", s_expenseTitles, (title, amount, month) => _service.AddExpense(title, amount, month));
 
-    private static void AddTransaction(string heading, IReadOnlyList<string> titlePresets, Func<string, decimal, YearMonth, Transaction> add)
+    /// <summary>
+    /// Returns <see langword="true"/> if a transaction was added, <see langword="false"/> if the
+    /// user backed out at title selection ("0. Cancel") before reaching any "q to cancel" step.
+    /// </summary>
+    private static bool AddTransaction(string heading, IReadOnlyList<string> titlePresets, Func<string, decimal, YearMonth, Transaction> add)
     {
         ConsoleMessage.Heading(heading);
 
-        var title = SelectTitle(titlePresets);
+        string title;
+        try
+        {
+            title = SelectTitle(titlePresets);
+        }
+        catch (UserCancelledException)
+        {
+            return false;
+        }
+
         var amount = ConsoleInput.ValidateInput(
             "Amount in SEK (q to cancel): ",
             ValidateAmount,
@@ -135,6 +148,7 @@ internal sealed class TransactionMenu
 
         var transaction = add(title, amount, month);
         ConsoleMessage.DisplaySuccessMessage($"{transaction.TypeName} '{transaction.Title}' added.");
+        return true;
     }
 
     private static string SelectTitle(IReadOnlyList<string> presets)

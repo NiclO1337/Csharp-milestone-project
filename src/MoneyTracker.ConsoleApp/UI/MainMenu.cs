@@ -64,12 +64,13 @@ internal sealed class MainMenu
                     _transactionMenu.ShowTransactions();
                     break;
                 case 2:
+                    // Func<bool> overload: pauses unless AddIncome silently backed out at title
+                    // selection ("0. Cancel") without reaching a "q to cancel" step.
                     ConsoleInput.TryRun(_transactionMenu.AddIncome);
-                    ConsoleInput.Pause(); // Pause and prompt for keypress before going back to main menu
                     break;
                 case 3:
+                    // Func<bool> overload: same reasoning as case 2.
                     ConsoleInput.TryRun(_transactionMenu.AddExpense);
-                    ConsoleInput.Pause(); // Pause and prompt for keypress before going back to main menu
                     break;
                 case 4:
                     ConsoleInput.TryRun(_transactionMenu.EditTransaction);

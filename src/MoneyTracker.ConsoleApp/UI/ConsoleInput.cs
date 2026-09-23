@@ -211,5 +211,29 @@ internal static class ConsoleInput
         }
     }
 
+    /// <summary>
+    /// Runs a menu action that reports whether it actually did anything, then pauses before
+    /// returning — unless it quietly backed out early (returned <see langword="false"/>) without
+    /// ever reaching a step a user could cancel out of with "q". A later "q" cancel still throws
+    /// <see cref="UserCancelledException"/> and still pauses, same as <see cref="TryRun(Action)"/>.
+    /// </summary>
+    internal static void TryRun(Func<bool> action)
+    {
+        var shouldPause = true;
+        try
+        {
+            shouldPause = action();
+        }
+        catch (UserCancelledException)
+        {
+            ConsoleMessage.DisplayWarningMessage("Cancelled - returning to previous menu.");
+        }
+
+        if (shouldPause)
+        {
+            Pause();
+        }
+    }
+
     private static bool IsCancel(string? input) => input is not null && input.Trim().Equals("q", StringComparison.OrdinalIgnoreCase);
 }
