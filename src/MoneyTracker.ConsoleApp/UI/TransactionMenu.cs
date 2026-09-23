@@ -55,33 +55,26 @@ internal sealed class TransactionMenu
                 $"Toggle direction (current: {direction})",
             ];
 
-            var choice = ConsoleInput.SelectMenuOption(menuItems, "Back to main menu");
+            Dictionary<int, string> disabledChoices = [];
+            if (page == 0)
+            {
+                disabledChoices[1] = "Already on the first page.";
+            }
+
+            if (page == pageCount - 1)
+            {
+                disabledChoices[2] = "Already on the last page.";
+            }
+
+            var choice = ConsoleInput.SelectMenuOption(menuItems, "Back to main menu", disabledChoices);
 
             switch (choice)
             {
                 case 1:
-                    if (page == 0)
-                    {
-                        ConsoleMessage.DisplayWarningMessage("Already on the first page.");
-                        Thread.Sleep(1000);
-                    }
-                    else
-                    {
-                        page--;
-                    }
-
+                    page--;
                     break;
                 case 2:
-                    if (page == pageCount - 1)
-                    {
-                        ConsoleMessage.DisplayWarningMessage("Already on the last page.");
-                        Thread.Sleep(1000);
-                    }
-                    else
-                    {
-                        page++;
-                    }
-
+                    page++;
                     break;
                 case 3:
                     (filter, page) = ApplyChange(filter, page);
@@ -130,7 +123,7 @@ internal sealed class TransactionMenu
         var amount = ConsoleInput.ValidateInput(
             "Amount in SEK (q to cancel): ",
             ValidateAmount,
-            "Invalid amount, must be greater than 0.",
+            $"Invalid amount, must be a number greater than 0 and less than {Transaction.MaxAmount}.",
             allowCancel: true);
         var month = ConsoleInput.ValidateInput(
             "Month yyyy-MM (q to cancel or just press Enter for current month): ",

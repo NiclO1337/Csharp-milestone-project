@@ -117,15 +117,34 @@ internal static class ConsoleInput
     /// match <paramref name="menuItems"/>'s current length — nothing to keep in sync by hand
     /// when items are added or removed.
     /// </summary>
-    internal static int SelectMenuOption(IReadOnlyList<string> menuItems, string zeroLabel)
+    /// <param name="disabledChoices">
+    /// Choices that are numerically valid but currently unavailable, each mapped to the message
+    /// shown when picked. Picking one re-prompts in place — same as any other invalid input —
+    /// rather than being returned, so the caller never has to handle it as a real result.
+    /// </param>
+    internal static int SelectMenuOption(
+        IReadOnlyList<string> menuItems,
+        string zeroLabel,
+        IReadOnlyDictionary<int, string>? disabledChoices = null)
     {
         DisplayNumberedList(menuItems);
         Console.WriteLine($"0. {zeroLabel}");
 
-        return ValidateInput(
-            $"Select option (0 - {menuItems.Count}): ",
-            ValidateIntegerRange(0, menuItems.Count),
-            $"Invalid input, select a number between 0 and {menuItems.Count}.");
+        while (true)
+        {
+            var choice = ValidateInput(
+                $"Select option (0 - {menuItems.Count}): ",
+                ValidateIntegerRange(0, menuItems.Count),
+                $"Invalid input, select a number between 0 and {menuItems.Count}.");
+
+            if (disabledChoices is not null && disabledChoices.TryGetValue(choice, out var message))
+            {
+                ConsoleMessage.DisplayErrorMessage(message);
+                continue;
+            }
+
+            return choice;
+        }
     }
 
     /// <summary>
@@ -152,7 +171,7 @@ internal static class ConsoleInput
     /// </summary>
     internal static void Pause()
     {
-        Console.Write("\nPress any key to continue to main menu...");
+        Console.Write("\nPress any key to continue...");
 
         if (Console.IsInputRedirected)
         {

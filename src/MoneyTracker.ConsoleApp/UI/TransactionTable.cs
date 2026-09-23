@@ -26,7 +26,6 @@ internal static class TransactionTable
         var widths = MeasureColumns(rows);
         var header = FormatRow(new Row("ID", "Type", "Title", "Month", "Amount (SEK)"), widths);
 
-        Console.WriteLine();
         Console.WriteLine(header);
         Console.WriteLine(new string('-', header.Length - ColumnPadding));
 
