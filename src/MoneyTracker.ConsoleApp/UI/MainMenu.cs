@@ -94,7 +94,7 @@ internal sealed class MainMenu
     private static void PrintSummary(BalanceSummary summary)
     {
         Console.WriteLine(
-            $"Balance: {summary.Balance.ToString("C", s_currency)}   " +
-            $"(income {summary.TotalIncome.ToString("C", s_currency)} · expenses {summary.TotalExpenses.ToString("C", s_currency)})");
+            $"Balance: {summary.Balance.ToString("C0", s_currency)}   " +
+            $"(income {summary.TotalIncome.ToString("C0", s_currency)} · expenses {summary.TotalExpenses.ToString("C0", s_currency)})");
     }
 }

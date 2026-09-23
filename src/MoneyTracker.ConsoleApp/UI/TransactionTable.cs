@@ -24,7 +24,7 @@ internal static class TransactionTable
 
         var rows = transactions.Select(ToRow).ToList();
         var widths = MeasureColumns(rows);
-        var header = FormatRow(new Row("ID", "Type", "Title", "Month", "Amount"), widths);
+        var header = FormatRow(new Row("ID", "Type", "Title", "Month", "Amount (SEK)"), widths);
 
         Console.WriteLine();
         Console.WriteLine(header);
@@ -43,14 +43,14 @@ internal static class TransactionTable
         transaction.TypeName,
         transaction.Title,
         transaction.Month.ToString(),
-        transaction.SignedAmount.ToString("N2", s_currency));
+        transaction.SignedAmount.ToString("N0", s_currency));
 
     private static ColumnWidths MeasureColumns(IReadOnlyList<Row> rows) => new(
         Id: Math.Max("ID".Length, rows.Max(r => r.Id.Length)) + ColumnPadding,
         Type: Math.Max("Type".Length, rows.Max(r => r.Type.Length)) + ColumnPadding,
         Title: Math.Max("Title".Length, rows.Max(r => r.Title.Length)) + ColumnPadding,
         Month: Math.Max("Month".Length, rows.Max(r => r.Month.Length)) + ColumnPadding,
-        Amount: Math.Max("Amount".Length, rows.Max(r => r.Amount.Length)) + ColumnPadding);
+        Amount: Math.Max("Amount (SEK)".Length, rows.Max(r => r.Amount.Length)) + ColumnPadding);
 
     private static string FormatRow(Row row, ColumnWidths widths) =>
         PadNumeric(row.Id, widths.Id)

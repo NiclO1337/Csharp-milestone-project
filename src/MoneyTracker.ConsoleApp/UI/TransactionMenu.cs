@@ -128,7 +128,7 @@ internal sealed class TransactionMenu
 
         var title = SelectTitle(titlePresets);
         var amount = ConsoleInput.ValidateInput(
-            "Amount (q to cancel): ",
+            "Amount in SEK (q to cancel): ",
             ValidateAmount,
             "Invalid amount, must be greater than 0.",
             allowCancel: true);
@@ -177,23 +177,23 @@ internal sealed class TransactionMenu
         }
 
         Console.WriteLine($"\nCurrent title:  {transaction.Title}");
-        Console.WriteLine($"Current amount: {transaction.Amount.ToString("N2", s_currency)}");
+        Console.WriteLine($"Current amount: {transaction.Amount.ToString("N0", s_currency)}");
         Console.WriteLine($"Current month:  {transaction.Month}");
 
         var title = ConsoleInput.ValidateInput(
-            "New title (Enter to keep current, q to cancel): ",
+            "New title (just press Enter to keep current, q to cancel): ",
             Transaction.MaxTitleLength,
             allowCancel: true,
             currentValue: transaction.Title);
         var amount = ConsoleInput.ValidateInput(
-            "New amount (Enter to keep current, q to cancel): ",
+            "New amount in SEK (just press Enter to keep current, q to cancel): ",
             ValidateAmount,
-            "Invalid amount, must be greater than 0.",
+            $"Invalid amount, must be a number greater than 0 and less than {Transaction.MaxAmount}.",
             allowCancel: true,
             hasCurrentValue: true,
             currentValue: transaction.Amount);
         var month = ConsoleInput.ValidateInput(
-            "New month yyyy-MM (Enter to keep current, q to cancel): ",
+            "New month yyyy-MM (just press Enter to keep current, q to cancel): ",
             ValidateMonth,
             "Invalid month, expected format yyyy-MM.",
             allowCancel: true,
@@ -267,8 +267,8 @@ internal sealed class TransactionMenu
     private static void PrintSummary(BalanceSummary summary)
     {
         Console.WriteLine(
-            $"Balance: {summary.Balance.ToString("C", s_currency)}   " +
-            $"(income {summary.TotalIncome.ToString("C", s_currency)} · expenses {summary.TotalExpenses.ToString("C", s_currency)})");
+            $"Balance: {summary.Balance.ToString("C0", s_currency)}   " +
+            $"(income {summary.TotalIncome.ToString("C0", s_currency)} · expenses {summary.TotalExpenses.ToString("C0", s_currency)})");
     }
 
     private static (bool isValid, decimal result) ValidateAmount(string input)
