@@ -152,16 +152,10 @@ internal sealed class TransactionMenu
             : presets[choice - 1];
     }
 
-    internal void EditTransaction()
+    internal void EditTransaction() => ShowTransactionsForAction("edit", EditTransactionById);
+
+    private void EditTransactionById(int id)
     {
-        ConsoleMessage.Heading("Edit Transaction");
-
-        var id = ConsoleInput.ValidateInput(
-            "Transaction ID (q to cancel): ",
-            ConsoleInput.ValidateIntegerRange(1, int.MaxValue),
-            "Invalid input, enter a positive number.",
-            allowCancel: true);
-
         var transaction = _service.FindById(id);
         if (transaction is null)
         {
@@ -204,16 +198,10 @@ internal sealed class TransactionMenu
         }
     }
 
-    internal void RemoveTransaction()
+    internal void RemoveTransaction() => ShowTransactionsForAction("remove", RemoveTransactionById);
+
+    private void RemoveTransactionById(int id)
     {
-        ConsoleMessage.Heading("Remove Transaction");
-
-        var id = ConsoleInput.ValidateInput(
-            "Transaction ID (q to cancel): ",
-            ConsoleInput.ValidateIntegerRange(1, int.MaxValue),
-            "Invalid input, enter a positive number.",
-            allowCancel: true);
-
         var transaction = _service.FindById(id);
         if (transaction is null)
         {
@@ -225,7 +213,7 @@ internal sealed class TransactionMenu
 
         if (!ConsoleInput.Confirm($"Remove this {transaction.TypeName.ToLowerInvariant()}?"))
         {
-            ConsoleMessage.DisplayWarningMessage("Cancelled.");
+            ConsoleMessage.DisplayWarningMessage("Removal cancelled.");
             return;
         }
 
@@ -239,6 +227,93 @@ internal sealed class TransactionMenu
             ConsoleMessage.DisplayErrorMessage($"No transaction found with ID {id}.");
         }
     }
+
+    /// <summary>
+    /// Shows a paginated transaction list with an action-specific "Enter Transaction ID to
+    /// {actionLabel}" option, shared by <see cref="EditTransaction"/> and
+    /// <see cref="RemoveTransaction"/> so the pagination logic isn't duplicated.
+    /// </summary>
+    private void ShowTransactionsForAction(string actionLabel, Action<int> action)
+    {
+        var page = 0;
+
+        while (true)
+        {
+            var transactions = _service.GetTransactions(sortBy: SortField.Month, direction: SortDirection.Descending);
+            var pageCount = Math.Max(1, (transactions.Count + PageSize - 1) / PageSize);
+
+            ConsoleMessage.Heading($"{actionLabel} Transaction");
+            TransactionTable.Display(transactions.Skip(page * PageSize).Take(PageSize).ToList());
+            Console.WriteLine($"\nPage {page + 1} of {pageCount}");
+            Console.WriteLine();
+
+            string[] menuItems =
+            [
+                "Previous page",
+                "Next page\n",
+                $"Enter Transaction ID to {actionLabel}",
+            ];
+
+            Dictionary<int, string> disabledChoices = [];
+            if (page == 0)
+            {
+                disabledChoices[1] = "Already on the first page.";
+            }
+
+            if (page == pageCount - 1)
+            {
+                disabledChoices[2] = "Already on the last page.";
+            }
+
+            var choice = ConsoleInput.SelectMenuOption(menuItems, "Back to main menu", disabledChoices);
+
+            switch (choice)
+            {
+                case 1:
+                    page--;
+                    break;
+                case 2:
+                    page++;
+                    break;
+                case 3:
+                    PromptIdAndRunAction(actionLabel, action);
+                    break;
+                case 0:
+                    return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Prompts for a transaction ID and runs <paramref name="action"/> on it. Cancelling — at
+    /// the ID prompt or mid-<paramref name="action"/> — is caught right here rather than left to
+    /// propagate up to <see cref="ConsoleInput.TryRun"/>, so it stays on the browsing list
+    /// instead of exiting all the way to the main menu. Always pauses afterward: success, error,
+    /// and cancellation all leave a message worth reading before the list redraws.
+    /// </summary>
+    private static void PromptIdAndRunAction(string actionLabel, Action<int> action)
+    {
+        try
+        {
+            var id = ConsoleInput.ValidateInput(
+                "Transaction ID (q to cancel): ",
+                ConsoleInput.ValidateIntegerRange(1, int.MaxValue),
+                "Invalid input, enter a positive number.",
+                allowCancel: true);
+            action(id);
+        }
+        catch (UserCancelledException)
+        {
+            // "remove" -> "Removal" is the one irregular noun form; everything else just gets
+            // capitalized (e.g. "edit" -> "Edit").
+            var actionNoun = actionLabel == "remove" ? "Removal" : Capitalize(actionLabel);
+            ConsoleMessage.DisplayWarningMessage($"{actionNoun} cancelled.");
+        }
+
+        ConsoleInput.Pause();
+    }
+
+    private static string Capitalize(string value) => char.ToUpperInvariant(value[0]) + value[1..];
 
     internal void ShowMonthlySummary()
     {
