@@ -24,7 +24,7 @@ internal static class ConsoleMessage
 
     internal static void DisplayWarningMessage(string message)
     {
-        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine(message);
         Console.ResetColor();
     }
