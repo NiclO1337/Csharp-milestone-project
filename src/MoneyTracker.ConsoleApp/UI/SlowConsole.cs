@@ -11,8 +11,22 @@ namespace MoneyTracker.ConsoleApp.UI;
 internal static class SlowConsole
 {
     private const int RowDelayMs = 30;
+    private const int CharDelayMs = 25;
 
     internal static void Install() => Console.SetOut(new SlowWriter(Console.Out));
+
+    /// <summary>
+    /// Writes <paramref name="text"/> one character at a time with a short delay between each,
+    /// for a typewriter effect. Does not append a trailing newline.
+    /// </summary>
+    internal static void TypeTextSlow(string text)
+    {
+        foreach (var c in text)
+        {
+            Console.Write(c);
+            Thread.Sleep(CharDelayMs);
+        }
+    }
 
     private sealed class SlowWriter(TextWriter inner) : TextWriter
     {

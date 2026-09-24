@@ -32,6 +32,11 @@ foreach (string line in new[]
 {
     Console.WriteLine(line);
 }
+// TODO uncomment slow type intro
+//SlowConsole.TypeTextSlow("\nWelcome to Dragon's Ledger - where every coin counts.\n");
+//SlowConsole.TypeTextSlow("\nA treasure-keeper's ledger for tracking your gold:\n");
+//SlowConsole.TypeTextSlow("mind your mint, weigh your winnings, spot the coin\n");
+//SlowConsole.TypeTextSlow("that got away, and keep your hoard from gathering dust.\n");
 
 Console.WriteLine("\nWelcome to Dragon's Ledger - where every coin counts.\n");
 Console.WriteLine("A treasure-keeper's ledger for tracking your gold:");
@@ -60,9 +65,12 @@ catch (DataStoreException ex)
 ConsoleMessage.Heading("Closing application");
 
 Console.ForegroundColor = ConsoleColor.DarkYellow;
+// TODO uncomment slow type intro
+//SlowConsole.TypeTextSlow("The hoard is secure and the ledger is closed... for now.\n\n");
+//SlowConsole.TypeTextSlow("Farewell, treasure keeper!\n\n\n");
+
 Console.WriteLine("The hoard is secure and the ledger is closed... for now.\n");
 Console.WriteLine("Farewell, treasure keeper!\n\n");
-
 foreach (string line in new[]
 {
     "                        \\`-\\`-._",
