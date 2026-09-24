@@ -53,6 +53,7 @@ internal static class ConsoleMessage
 
     internal static void Heading(string title, ConsoleColor color = ConsoleColor.DarkCyan)
     {
+        Console.Clear();
         var culture = CultureInfo.GetCultureInfo("sv-SE");
         var titleCase = culture.TextInfo.ToTitleCase(title.ToLower(culture));
         WriteColoredLine($"\n=== {titleCase} ===\n", color);
@@ -65,6 +66,7 @@ internal static class ConsoleMessage
     /// </summary>
     internal static void MainHeading(string title, ConsoleColor color = ConsoleColor.DarkYellow)
     {
+        Console.Clear();
         var border = new string('=', title.Length + 6);
         WriteColoredLine($"\n\n{border}", color);
         WriteColoredLine($"   {title}", color);

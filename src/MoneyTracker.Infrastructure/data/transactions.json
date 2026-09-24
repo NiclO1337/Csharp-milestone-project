@@ -388,7 +388,7 @@
     "type": "expense",
     "id": 56,
     "title": "Mysterious expense with long name",
-    "amount": 2345,
+    "amount": 3456,
     "month": "2026-09"
   }
 ]
