@@ -249,13 +249,15 @@ Resulting file shape:
 
 ```json
 [
-  { "type": "income",  "id": 1, "title": "Lön",    "amount": 32000.00, "month": "2026-09" },
-  { "type": "expense", "id": 2, "title": "Hyra",   "amount": 9500.00,  "month": "2026-09" }
+  { "type": "income",  "id": 1, "title": "Salary",    "amount": 32000.00, "month": "2026-09" },
+  { "type": "expense", "id": 2, "title": "Rent",   "amount": 9500.00,  "month": "2026-09" }
 ]
 ```
 
-**Location.** `Path.Combine(AppContext.BaseDirectory, "data", "transactions.json")`. Note this
-resolves under `bin/Debug/net10.0/`, not the source tree. The directory is created on first save.
+**Location.** `src/MoneyTracker.Infrastructure/data/transactions.json`. `Program.cs` resolves this
+by walking up from `AppContext.BaseDirectory` (which sits under `bin/<Config>/net10.0/`) back into
+the source tree, so the file is committed to the repo — including its seed data — instead of being
+left behind in the gitignored build output. The directory is created on first save.
 
 **Missing or empty file** → return an empty list. A first run is not an error.
 
@@ -274,7 +276,9 @@ silently empty data.
 `Program.cs` is the composition root and contains no business logic:
 
 ```csharp
-var path = Path.Combine(AppContext.BaseDirectory, "data", "transactions.json");
+var path = Path.GetFullPath(Path.Combine(
+    AppContext.BaseDirectory, "..", "..", "..", "..",
+    "MoneyTracker.Infrastructure", "data", "transactions.json"));
 var repository = new JsonTransactionRepository(path);
 var service = new TransactionService(repository);
 new MainMenu(service).Run();

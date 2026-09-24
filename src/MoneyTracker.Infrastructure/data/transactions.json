@@ -1,0 +1,394 @@
+[
+  {
+    "type": "income",
+    "id": 1,
+    "title": "Salary",
+    "amount": 25500,
+    "month": "2026-05"
+  },
+  {
+    "type": "expense",
+    "id": 2,
+    "title": "Rent",
+    "amount": 9500,
+    "month": "2026-05"
+  },
+  {
+    "type": "expense",
+    "id": 3,
+    "title": "Electricity",
+    "amount": 420,
+    "month": "2026-05"
+  },
+  {
+    "type": "expense",
+    "id": 4,
+    "title": "Groceries",
+    "amount": 8600,
+    "month": "2026-05"
+  },
+  {
+    "type": "expense",
+    "id": 5,
+    "title": "Subscription",
+    "amount": 499,
+    "month": "2026-05"
+  },
+  {
+    "type": "expense",
+    "id": 6,
+    "title": "Transport",
+    "amount": 900,
+    "month": "2026-05"
+  },
+  {
+    "type": "expense",
+    "id": 37,
+    "title": "Gym",
+    "amount": 1399,
+    "month": "2026-05"
+  },
+  {
+    "type": "income",
+    "id": 7,
+    "title": "Salary",
+    "amount": 25500,
+    "month": "2026-06"
+  },
+  {
+    "type": "income",
+    "id": 8,
+    "title": "Frilans",
+    "amount": 2200,
+    "month": "2026-06"
+  },
+  {
+    "type": "expense",
+    "id": 9,
+    "title": "Rent",
+    "amount": 9500,
+    "month": "2026-06"
+  },
+  {
+    "type": "expense",
+    "id": 10,
+    "title": "Electricity",
+    "amount": 380,
+    "month": "2026-06"
+  },
+  {
+    "type": "expense",
+    "id": 11,
+    "title": "Groceries",
+    "amount": 7950,
+    "month": "2026-06"
+  },
+  {
+    "type": "expense",
+    "id": 12,
+    "title": "Subscription",
+    "amount": 499,
+    "month": "2026-06"
+  },
+  {
+    "type": "expense",
+    "id": 13,
+    "title": "Entertainment",
+    "amount": 1200,
+    "month": "2026-06"
+  },
+  {
+    "type": "expense",
+    "id": 14,
+    "title": "Transport",
+    "amount": 900,
+    "month": "2026-06"
+  },
+  {
+    "type": "expense",
+    "id": 38,
+    "title": "Gym",
+    "amount": 1399,
+    "month": "2026-06"
+  },
+  {
+    "type": "income",
+    "id": 15,
+    "title": "Salary",
+    "amount": 25500,
+    "month": "2026-07"
+  },
+  {
+    "type": "expense",
+    "id": 16,
+    "title": "Rent",
+    "amount": 9500,
+    "month": "2026-07"
+  },
+  {
+    "type": "expense",
+    "id": 17,
+    "title": "Electricity",
+    "amount": 350,
+    "month": "2026-07"
+  },
+  {
+    "type": "expense",
+    "id": 18,
+    "title": "Groceries",
+    "amount": 9200,
+    "month": "2026-07"
+  },
+  {
+    "type": "expense",
+    "id": 19,
+    "title": "Subscription",
+    "amount": 499,
+    "month": "2026-07"
+  },
+  {
+    "type": "expense",
+    "id": 20,
+    "title": "Entertainment",
+    "amount": 2500,
+    "month": "2026-07"
+  },
+  {
+    "type": "expense",
+    "id": 21,
+    "title": "Transport",
+    "amount": 600,
+    "month": "2026-07"
+  },
+  {
+    "type": "expense",
+    "id": 39,
+    "title": "Gym",
+    "amount": 1399,
+    "month": "2026-07"
+  },
+  {
+    "type": "income",
+    "id": 22,
+    "title": "Salary",
+    "amount": 26000,
+    "month": "2026-08"
+  },
+  {
+    "type": "expense",
+    "id": 23,
+    "title": "Rent",
+    "amount": 9500,
+    "month": "2026-08"
+  },
+  {
+    "type": "expense",
+    "id": 24,
+    "title": "Electricity",
+    "amount": 390,
+    "month": "2026-08"
+  },
+  {
+    "type": "expense",
+    "id": 25,
+    "title": "Groceries",
+    "amount": 9800,
+    "month": "2026-08"
+  },
+  {
+    "type": "expense",
+    "id": 26,
+    "title": "Subscription",
+    "amount": 499,
+    "month": "2026-08"
+  },
+  {
+    "type": "expense",
+    "id": 27,
+    "title": "Clothing",
+    "amount": 1200,
+    "month": "2026-08"
+  },
+  {
+    "type": "expense",
+    "id": 28,
+    "title": "Transport",
+    "amount": 900,
+    "month": "2026-08"
+  },
+  {
+    "type": "expense",
+    "id": 40,
+    "title": "Gym",
+    "amount": 1399,
+    "month": "2026-08"
+  },
+  {
+    "type": "income",
+    "id": 29,
+    "title": "Salary",
+    "amount": 26000,
+    "month": "2026-09"
+  },
+  {
+    "type": "income",
+    "id": 30,
+    "title": "Bonus",
+    "amount": 5000,
+    "month": "2026-09"
+  },
+  {
+    "type": "expense",
+    "id": 31,
+    "title": "Rent",
+    "amount": 9500,
+    "month": "2026-09"
+  },
+  {
+    "type": "expense",
+    "id": 32,
+    "title": "Electricity",
+    "amount": 550,
+    "month": "2026-09"
+  },
+  {
+    "type": "expense",
+    "id": 33,
+    "title": "Groceries",
+    "amount": 8100,
+    "month": "2026-09"
+  },
+  {
+    "type": "expense",
+    "id": 34,
+    "title": "Subscription",
+    "amount": 499,
+    "month": "2026-09"
+  },
+  {
+    "type": "expense",
+    "id": 35,
+    "title": "Entertainment",
+    "amount": 800,
+    "month": "2026-09"
+  },
+  {
+    "type": "expense",
+    "id": 36,
+    "title": "Transport",
+    "amount": 900,
+    "month": "2026-09"
+  },
+  {
+    "type": "expense",
+    "id": 41,
+    "title": "Gym",
+    "amount": 1399,
+    "month": "2026-09"
+  },
+  {
+    "type": "expense",
+    "id": 42,
+    "title": "Dining Out",
+    "amount": 1200,
+    "month": "2026-05"
+  },
+  {
+    "type": "expense",
+    "id": 43,
+    "title": "Dining Out",
+    "amount": 1400,
+    "month": "2026-06"
+  },
+  {
+    "type": "expense",
+    "id": 44,
+    "title": "Dining Out",
+    "amount": 950,
+    "month": "2026-07"
+  },
+  {
+    "type": "expense",
+    "id": 45,
+    "title": "Dining Out",
+    "amount": 800,
+    "month": "2026-08"
+  },
+  {
+    "type": "expense",
+    "id": 46,
+    "title": "Dining Out",
+    "amount": 1100,
+    "month": "2026-09"
+  },
+  {
+    "type": "expense",
+    "id": 47,
+    "title": "Phone",
+    "amount": 109,
+    "month": "2026-05"
+  },
+  {
+    "type": "expense",
+    "id": 48,
+    "title": "Phone",
+    "amount": 109,
+    "month": "2026-06"
+  },
+  {
+    "type": "expense",
+    "id": 49,
+    "title": "Phone",
+    "amount": 109,
+    "month": "2026-07"
+  },
+  {
+    "type": "expense",
+    "id": 50,
+    "title": "Phone",
+    "amount": 109,
+    "month": "2026-08"
+  },
+  {
+    "type": "expense",
+    "id": 51,
+    "title": "Phone",
+    "amount": 109,
+    "month": "2026-09"
+  },
+  {
+    "type": "expense",
+    "id": 52,
+    "title": "Mysterious expense with long name",
+    "amount": 2345,
+    "month": "2026-05"
+  },
+  {
+    "type": "expense",
+    "id": 53,
+    "title": "Mysterious expense with long name",
+    "amount": 2345,
+    "month": "2026-06"
+  },
+  {
+    "type": "expense",
+    "id": 54,
+    "title": "Mysterious expense with long name",
+    "amount": 2345,
+    "month": "2026-07"
+  },
+  {
+    "type": "expense",
+    "id": 55,
+    "title": "Mysterious expense with long name",
+    "amount": 2345,
+    "month": "2026-08"
+  },
+  {
+    "type": "expense",
+    "id": 56,
+    "title": "Mysterious expense with long name",
+    "amount": 2345,
+    "month": "2026-09"
+  }
+]

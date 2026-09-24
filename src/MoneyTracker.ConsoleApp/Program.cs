@@ -40,7 +40,11 @@ Console.WriteLine("that got away, and keep your hoard from gathering dust.\n");
 Console.ResetColor();
 ConsoleInput.Pause();
 
-var path = Path.Combine(AppContext.BaseDirectory, "data", "transactions.json");
+// AppContext.BaseDirectory is bin/<Config>/net10.0/; walk back up to src/ so the data file
+// lives in the source tree and gets committed, not left behind in the gitignored build output.
+var path = Path.GetFullPath(Path.Combine(
+    AppContext.BaseDirectory, "..", "..", "..", "..",
+    "MoneyTracker.Infrastructure", "data", "transactions.json"));
 var repository = new JsonTransactionRepository(path);
 
 try

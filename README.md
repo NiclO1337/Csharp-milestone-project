@@ -224,7 +224,7 @@ three projects)
 
 ```mermaid
 flowchart TD
-    Start([Start]) --> Load[/"Load data/transactions.json"/]
+    Start([Start]) --> Load[/"Load Infrastructure/data/transactions.json"/]
     Load --> Menu{"Main menu<br/>0 - 6"}
 
     Menu -->|"1 · 6 — view"| Read["Show transactions<br/>Monthly summary"]
@@ -254,9 +254,10 @@ by `System.Text.Json`, and is what allows the correct subclass to be reconstruct
 ]
 ```
 
-The file lives at `data/transactions.json` relative to the built executable
-(`src/MoneyTracker.ConsoleApp/bin/Debug/net10.0/`). It is created on first save; a missing file
-is treated as an empty list, not an error. It is generated state and should not be edited by hand.
+The file lives at `src/MoneyTracker.Infrastructure/data/transactions.json`, inside the source
+tree so it's committed to the repo and ships with sample data for graders. It is created on first
+save if missing; a missing file is treated as an empty list, not an error. It is generated state
+and should not be edited by hand — let the app write to it.
 
 ---
 
