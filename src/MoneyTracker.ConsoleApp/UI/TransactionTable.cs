@@ -32,8 +32,8 @@ internal static class TransactionTable
         var header = FormatRow(new Row("ID", "Type", "Title", "Month", "Year", "Amount (SEK)", 0m), widths);
         var tableWidth = header.Length - ColumnPadding;
 
-        Console.WriteLine(header);
-        Console.WriteLine(new string('-', tableWidth));
+        ConsoleMessage.WriteColoredLine(header, ConsoleColor.DarkYellow);
+        ConsoleMessage.WriteColoredLine(new string('-', tableWidth), ConsoleColor.DarkCyan);
 
         foreach (var row in rows)
         {
@@ -42,7 +42,7 @@ internal static class TransactionTable
             Console.WriteLine();
         }
 
-        Console.WriteLine(new string('-', tableWidth));
+        ConsoleMessage.WriteColoredLine(new string('-', tableWidth), ConsoleColor.DarkYellow);
 
         return tableWidth;
     }
