@@ -2,7 +2,7 @@
 
 A console application for tracking personal income and expenses by month, written in C# on .NET 10.
 
-> Course milestone project — <!-- TODO: course name, school, term -->
+> Course milestone project — Full Stack C# .NET Web Development with AI-powered development
 > Author: Niclas Hugdahl
 
 ---
@@ -35,8 +35,7 @@ The project is built as a multi-project solution with a deliberate separation be
 persistence, and user interface — the dependency direction is enforced by the compiler rather
 than by convention.
 
-<!-- TODO: add a screenshot of the running app -->
-<!-- ![Intro](docs/screenshot.png) -->
+![Intro](docs/intro.png)
 
 ---
 
@@ -48,7 +47,7 @@ than by convention.
 - **Edit** and **remove** existing entries
 - **Paginated lists** (13 rows/page), with filter, sort field and direction changeable in place
 - **Balance summary** — total income, total expenses and net balance, overall or per month
-- **Autosave** after every add, edit and delete, not only on quit
+- **Autosave** after every add, edit and delete
 - **Crash-safe writes** — data is written to a temporary file and then moved into place, so an
   interrupted save cannot leave a half-written file
 - Amounts accept both `1234,50` and `1234.50`
@@ -90,14 +89,12 @@ dotnet test
 
 The application opens on the main menu and returns to it after every action:
 
-<!-- TODO: add a screenshot of the running app -->
-<!-- ![The main menu](docs/screenshot.png) -->
+![The main menu](docs/main-menu.png)
 
 The transaction list is paginated, and its filter, sort field and sort direction can each be
 changed in place without leaving the screen:
 
-<!-- TODO: add a screenshot of the running app -->
-<!-- ![Show Transactions page](docs/screenshot.png) -->
+![Show Transactions page](docs/show-transactions.png)
 
 Months are entered as `YYYY-MM`, for example `2026-09`.
 

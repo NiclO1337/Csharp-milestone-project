@@ -62,7 +62,7 @@ internal sealed class TransactionMenu
                 "Previous page",
                 "Next page\n",
                 $"Change filter (current: {ConsoleInput.EnumDisplayName(filter)})",
-                $"Change sort (current: {sortBy})",
+                $"Change sorting (current: {sortBy})",
                 $"Toggle direction (current: {direction})",
             ];
 
