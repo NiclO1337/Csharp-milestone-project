@@ -168,32 +168,75 @@ internal sealed class TransactionMenu
 
     internal void EditTransaction() => ShowTransactionsForAction("edit", EditTransactionById);
 
-    private void EditTransactionById(int id)
+    /// <summary>
+    /// Returns <see langword="true"/> if a field was actually changed, <see langword="false"/>
+    /// if the user picked "0. Cancel" without changing anything. Either way this only makes one
+    /// pass — editing loops by returning to <see cref="ShowTransactionsForAction"/>'s list and
+    /// picking this ID again, not by looping within this method.
+    /// </summary>
+    private bool EditTransactionById(int id)
     {
         var transaction = _service.FindById(id);
         if (transaction is null)
         {
             ConsoleMessage.DisplayErrorMessage($"No transaction found with ID {id}.");
-            return;
+            return true;
         }
 
-        Console.WriteLine($"\nCurrent title:  {transaction.Title}");
-        Console.WriteLine($"Current amount: {transaction.Amount.ToString("N0", s_currency)}");
-        Console.WriteLine($"Current month:  {transaction.Month}");
+        ConsoleMessage.Heading("Edit Transaction");
+        Console.WriteLine("Select which field to edit\n");
 
-        var title = ConsoleInput.ValidateInput(
+        string[] menuItems =
+        [
+            "All fields",
+            $"Title: {transaction.Title}",
+            $"Amount: {transaction.Amount.ToString("N0", s_currency)}",
+            $"Month: {transaction.Month}",
+        ];
+        var choice = ConsoleInput.SelectMenuOption(menuItems, "Cancel");
+
+        if (choice == 0)
+        {
+            return false;
+        }
+
+        switch (choice)
+        {
+            case 1:
+                ApplyUpdate(id, PromptTitle(transaction), PromptAmount(transaction), PromptMonth(transaction));
+                break;
+            case 2:
+                ApplyUpdate(id, PromptTitle(transaction), transaction.Amount, transaction.Month);
+                break;
+            case 3:
+                ApplyUpdate(id, transaction.Title, PromptAmount(transaction), transaction.Month);
+                break;
+            case 4:
+                ApplyUpdate(id, transaction.Title, transaction.Amount, PromptMonth(transaction));
+                break;
+        }
+
+        return true;
+    }
+
+    private static string PromptTitle(Transaction transaction) =>
+        ConsoleInput.ValidateInput(
             "New title (just press Enter to keep current, q to cancel): ",
             Transaction.MaxTitleLength,
             allowCancel: true,
             currentValue: transaction.Title);
-        var amount = ConsoleInput.ValidateInput(
+
+    private static decimal PromptAmount(Transaction transaction) =>
+        ConsoleInput.ValidateInput(
             "New amount in SEK (just press Enter to keep current, q to cancel): ",
             ValidateAmount,
             $"Invalid amount, must be a number greater than 0 and less than {Transaction.MaxAmount}.",
             allowCancel: true,
             hasCurrentValue: true,
             currentValue: transaction.Amount);
-        var month = ConsoleInput.ValidateInput(
+
+    private static YearMonth PromptMonth(Transaction transaction) =>
+        ConsoleInput.ValidateInput(
             "New month yyyy-MM (just press Enter to keep current, q to cancel): ",
             ValidateMonth,
             "Invalid month, expected format yyyy-MM.",
@@ -201,6 +244,8 @@ internal sealed class TransactionMenu
             hasCurrentValue: true,
             currentValue: transaction.Month);
 
+    private void ApplyUpdate(int id, string title, decimal amount, YearMonth month)
+    {
         try
         {
             _service.Update(id, title, amount, month);
@@ -214,13 +259,13 @@ internal sealed class TransactionMenu
 
     internal void RemoveTransaction() => ShowTransactionsForAction("remove", RemoveTransactionById);
 
-    private void RemoveTransactionById(int id)
+    private bool RemoveTransactionById(int id)
     {
         var transaction = _service.FindById(id);
         if (transaction is null)
         {
             ConsoleMessage.DisplayErrorMessage($"No transaction found with ID {id}.");
-            return;
+            return true;
         }
 
         TransactionTable.Display([transaction]);
@@ -228,7 +273,7 @@ internal sealed class TransactionMenu
         if (!ConsoleInput.Confirm($"Remove this {transaction.TypeName.ToLowerInvariant()}?"))
         {
             ConsoleMessage.DisplayWarningMessage("Removal cancelled.");
-            return;
+            return true;
         }
 
         try
@@ -240,6 +285,8 @@ internal sealed class TransactionMenu
         {
             ConsoleMessage.DisplayErrorMessage($"No transaction found with ID {id}.");
         }
+
+        return true;
     }
 
     /// <summary>
@@ -247,7 +294,7 @@ internal sealed class TransactionMenu
     /// {actionLabel}" option, shared by <see cref="EditTransaction"/> and
     /// <see cref="RemoveTransaction"/> so the pagination logic isn't duplicated.
     /// </summary>
-    private void ShowTransactionsForAction(string actionLabel, Action<int> action)
+    private void ShowTransactionsForAction(string actionLabel, Func<int, bool> action)
     {
         var page = 0;
 
@@ -302,11 +349,13 @@ internal sealed class TransactionMenu
     /// Prompts for a transaction ID and runs <paramref name="action"/> on it. Cancelling — at
     /// the ID prompt or mid-<paramref name="action"/> — is caught right here rather than left to
     /// propagate up to <see cref="ConsoleInput.TryRun"/>, so it stays on the browsing list
-    /// instead of exiting all the way to the main menu. Always pauses afterward: success, error,
-    /// and cancellation all leave a message worth reading before the list redraws.
+    /// instead of exiting all the way to the main menu. Pauses afterward unless
+    /// <paramref name="action"/> returns <see langword="false"/> (nothing was actually done);
+    /// a caught cancellation always pauses, since it always has a message worth reading.
     /// </summary>
-    private static void PromptIdAndRunAction(string actionLabel, Action<int> action)
+    private static void PromptIdAndRunAction(string actionLabel, Func<int, bool> action)
     {
+        var shouldPause = true;
         try
         {
             var id = ConsoleInput.ValidateInput(
@@ -314,7 +363,7 @@ internal sealed class TransactionMenu
                 ConsoleInput.ValidateIntegerRange(1, int.MaxValue),
                 "Invalid input, enter a positive number.",
                 allowCancel: true);
-            action(id);
+            shouldPause = action(id);
         }
         catch (UserCancelledException)
         {
@@ -324,7 +373,10 @@ internal sealed class TransactionMenu
             ConsoleMessage.DisplayWarningMessage($"{actionNoun} cancelled.");
         }
 
-        ConsoleInput.Pause();
+        if (shouldPause)
+        {
+            ConsoleInput.Pause();
+        }
     }
 
     private static string Capitalize(string value) => char.ToUpperInvariant(value[0]) + value[1..];
