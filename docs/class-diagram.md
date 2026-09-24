@@ -11,25 +11,32 @@ classDiagram
     namespace Core {
         class Transaction {
             <<abstract>>
+            +int MaxTitleLength$
+            +decimal MaxAmount$
             +int Id
             +string Title
             +decimal Amount
             +YearMonth Month
             +decimal SignedAmount*
+            +string TypeName*
             #Transaction(int id, string title, decimal amount, YearMonth month)
             +Update(string title, decimal amount, YearMonth month) void
         }
         class Income {
             +decimal SignedAmount
+            +string TypeName
         }
         class Expense {
             +decimal SignedAmount
+            +string TypeName
         }
         class YearMonth {
+            +int MinYear$
+            +int MaxYear$
             +int Year
             +int Month
-            +FromDate(DateOnly date)$ YearMonth
-            +TryParse(string input, out YearMonth result)$ bool
+            +YearMonth Current$
+            +TryParse(string value, out YearMonth result)$ bool
             +CompareTo(YearMonth other) int
             +ToString() string
         }
@@ -65,29 +72,31 @@ classDiagram
             -List~Transaction~ _transactions
             -int _nextId
             +GetTransactions(TransactionFilter filter, SortField sortBy, SortDirection direction) IReadOnlyList~Transaction~
+            +GetTotal(TransactionFilter filter) decimal
             +FindById(int id) Transaction
+            +GetTransactionsForMonth(YearMonth? month) IReadOnlyList~Transaction~
+            +GetAvailableMonths() IReadOnlyList~YearMonth~
             +AddIncome(string title, decimal amount, YearMonth month) Income
             +AddExpense(string title, decimal amount, YearMonth month) Expense
             +Update(int id, string title, decimal amount, YearMonth month) Transaction
             +Remove(int id) void
-            +GetSummary(YearMonth month) BalanceSummary
+            +GetSummary(YearMonth? month) BalanceSummary
             -Persist() void
         }
         class TransactionNotFoundException {
-            +int TransactionId
+            +int Id
         }
         class DataStoreException {
-            +DataStoreException(string message, Exception inner)
+            +DataStoreException(string message, Exception innerException)
         }
     }
 
     namespace Infrastructure {
         class JsonTransactionRepository {
-            -string _filePath
-            -JsonSerializerOptions s_options$
+            -string _path
+            -JsonSerializerOptions _options
             +Load() IReadOnlyList~Transaction~
             +Save(IEnumerable~Transaction~ transactions) void
-            -WriteAtomically(string json) void
         }
         class YearMonthJsonConverter {
             +Read(...) YearMonth
@@ -97,34 +106,53 @@ classDiagram
 
     namespace ConsoleApp {
         class Program {
-            +Main(string[] args)$ void
+            <<top-level statements>>
         }
         class MainMenu {
             -TransactionService _service
+            -TransactionMenu _transactionMenu
             +Run() void
-            -ShowTransactions() void
-            -AddIncome() void
-            -AddExpense() void
-            -EditTransaction() void
-            -RemoveTransaction() void
-            -ShowSummary() void
+            -RunMenuLoop() void
+            -PrintSummary(BalanceSummary summary)$ void
+        }
+        class TransactionMenu {
+            -TransactionService _service
+            +ShowTransactions() void
+            +AddIncome() bool
+            +AddExpense() bool
+            +EditTransaction() void
+            +RemoveTransaction() void
+            +ShowMonthlySummary() void
         }
         class ConsoleInput {
-            +ReadMenuChoice(string prompt, int min, int max)$ int
-            +ReadText(string prompt, string current)$ string
-            +ReadAmount(string prompt, decimal current)$ decimal
-            +ReadYearMonth(string prompt, YearMonth current)$ YearMonth
-            +Confirm(string prompt)$ bool
+            +ValidateInput(string prompt, int maxLength, bool allowCancel, string? currentValue)$ string
+            +ValidateInput~T~(string prompt, Func validator, string errorMessage, bool allowCancel, bool hasCurrentValue, T currentValue)$ T
+            +ValidateIntegerRange(int min, int max)$ Func
+            +SelectMenuOption(IReadOnlyList~string~ menuItems, string zeroLabel, IReadOnlyDictionary~int,string~? disabledChoices)$ int
+            +SelectEnumOption~T~(T current)$ T
+            +EnumDisplayName~T~(T value)$ string
+            +Confirm(string message)$ bool
+            +Pause()$ void
+            +TryRun(Action action)$ void
+            +TryRun(Func~bool~ action)$ void
         }
         class TransactionTable {
-            +Render(IReadOnlyList~Transaction~ transactions)$ void
-            +RenderSummary(BalanceSummary summary)$ void
+            +Display(IReadOnlyList~Transaction~ transactions)$ int?
         }
         class ConsoleMessage {
-            +Success(string text)$ void
-            +Warning(string text)$ void
-            +Error(string text)$ void
+            +DisplayErrorMessage(string message)$ void
+            +DisplaySuccessMessage(string message)$ void
+            +DisplayWarningMessage(string message)$ void
+            +WriteColored(string text, ConsoleColor color)$ void
+            +WriteColoredLine(string text, ConsoleColor color)$ void
+            +Heading(string title, ConsoleColor color)$ void
+            +MainHeading(string title, ConsoleColor color)$ void
         }
+        class SlowConsole {
+            +Install()$ void
+            +TypeTextSlow(string text)$ void
+        }
+        class UserCancelledException
     }
 
     Transaction <|-- Income
@@ -142,20 +170,38 @@ classDiagram
     JsonTransactionRepository ..> DataStoreException : throws
     Program ..> JsonTransactionRepository : creates
     Program ..> TransactionService : creates
-    Program ..> MainMenu : runs
+    Program ..> MainMenu : creates and runs
+    Program ..> SlowConsole : installs
     MainMenu --> TransactionService : uses
-    MainMenu ..> ConsoleInput : uses
-    MainMenu ..> TransactionTable : uses
-    MainMenu ..> ConsoleMessage : uses
+    MainMenu --> TransactionMenu : delegates to
+    MainMenu ..> UserCancelledException : catches
+    TransactionMenu --> TransactionService : uses
+    TransactionMenu ..> ConsoleInput : uses
+    TransactionMenu ..> TransactionTable : uses
+    TransactionMenu ..> ConsoleMessage : uses
+    ConsoleInput ..> ConsoleMessage : uses
+    ConsoleInput ..> UserCancelledException : throws
+    UserCancelledException --|> Exception
+    TransactionNotFoundException --|> Exception
+    DataStoreException --|> Exception
 ```
 
 Notes the diagram can't express:
 
-- `Income`, `Expense`, `MainMenu`, `JsonTransactionRepository` and `YearMonthJsonConverter` are `sealed`.
+- `Income`, `Expense`, `MainMenu`, `TransactionMenu`, `JsonTransactionRepository`, `YearMonthJsonConverter`
+  and `UserCancelledException` are `sealed`.
 - `YearMonth` and `BalanceSummary` are `readonly record struct`.
-- `ConsoleInput`, `TransactionTable` and `ConsoleMessage` are `static` classes (the `$` marks their static members).
-- `TransactionNotFoundException` and `DataStoreException` derive from `Exception`.
-- `SignedAmount` (marked `*`) is abstract on `Transaction`; `Income` returns `+Amount`, `Expense` returns `-Amount`.
+- `ConsoleInput`, `TransactionTable`, `ConsoleMessage` and `SlowConsole` are `static` classes
+  (the `$` marks their static members).
+- `TransactionNotFoundException`, `DataStoreException` and `UserCancelledException` derive from
+  `Exception`.
+- `SignedAmount` and `TypeName` (marked `*`) are abstract on `Transaction`; `Income` and `Expense`
+  each override both — no `if (isExpense)` or type check anywhere in the app.
+- `Program` has no class declaration in code — it's C# top-level statements, shown here as a
+  class only to represent the composition root's relationships.
+- `MainMenu` owns only the top-level menu loop and its "Quit" condition; each of the six actions
+  is delegated to `TransactionMenu`, which owns pagination, filtering/sorting-in-place, add,
+  edit, remove and the monthly summary screen.
 
 ## Project references (dependency direction)
 

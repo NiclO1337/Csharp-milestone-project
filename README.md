@@ -11,7 +11,6 @@ A console application for tracking personal income and expenses by month, writte
 
 - [About](#about)
 - [Features](#features)
-- [Requirements from the brief](#requirements-from-the-brief)
 - [Getting started](#getting-started)
 - [Usage](#usage)
 - [Project structure](#project-structure)
@@ -22,6 +21,7 @@ A console application for tracking personal income and expenses by month, writte
 - [Design decisions](#design-decisions)
 - [Planning and documentation](#planning-and-documentation)
 - [Roadmap](#roadmap)
+- [License](#license)
 
 ---
 
@@ -36,7 +36,7 @@ persistence, and user interface — the dependency direction is enforced by the 
 than by convention.
 
 <!-- TODO: add a screenshot of the running app -->
-<!-- ![The main menu](docs/screenshot.png) -->
+<!-- ![Intro](docs/screenshot.png) -->
 
 ---
 
@@ -46,27 +46,13 @@ than by convention.
 - **Sort** by month, amount or title, ascending or descending
 - **Filter** to show only incomes, only expenses, or everything
 - **Edit** and **remove** existing entries
+- **Paginated lists** (13 rows/page), with filter, sort field and direction changeable in place
 - **Balance summary** — total income, total expenses and net balance, overall or per month
 - **Autosave** after every add, edit and delete, not only on quit
 - **Crash-safe writes** — data is written to a temporary file and then moved into place, so an
   interrupted save cannot leave a half-written file
 - Amounts accept both `1234,50` and `1234.50`
 - Swedish currency formatting (`sv-SE`, SEK)
-
----
-
-## Requirements from the brief
-
-| # | Requirement | Status | Implemented by |
-|---|-------------|--------|----------------|
-| 1 | Model an item with title, amount and month, distinguishing income from expense | ⬜ | `Transaction` (abstract) with `Income` / `Expense` |
-| 2 | Display a collection sortable ascending/descending by month, amount or title | ⬜ | `TransactionService.GetTransactions` |
-| 3 | Display only expenses or only incomes | ⬜ | `TransactionFilter` |
-| 4 | Edit and remove items | ⬜ | `TransactionService.Update` / `.Remove` |
-| 5 | Text-based user interface | ⬜ | `MoneyTracker.ConsoleApp` |
-| 6 | Load and save the item list to file | ⬜ | `ITransactionRepository` / `JsonTransactionRepository` |
-
-<!-- TODO: flip ⬜ to ✅ as each one lands -->
 
 ---
 
@@ -104,29 +90,14 @@ dotnet test
 
 The application opens on the main menu and returns to it after every action:
 
-```
-=== MoneyTracker ===
-Balance: 22 500,00 kr   (income 32 000,00 kr · expenses 9 500,00 kr)
+<!-- TODO: add a screenshot of the running app -->
+<!-- ![The main menu](docs/screenshot.png) -->
 
-1. Show transactions
-2. Add income
-3. Add expense
-4. Edit transaction
-5. Remove transaction
-6. Monthly summary
-0. Quit
+The transaction list is paginated, and its filter, sort field and sort direction can each be
+changed in place without leaving the screen:
 
-Select option (0 - 6):
-```
-
-Listing transactions asks for a filter, then a sort field, then a direction:
-
-```
-  ID  Type      Title                    Month      Amount
-  ──  ────────  ───────────────────────  ───────  ──────────
-   1  Income    Lön                      2026-09   32 000,00
-   2  Expense   Hyra                     2026-09   -9 500,00
-```
+<!-- TODO: add a screenshot of the running app -->
+<!-- ![Show Transactions page](docs/screenshot.png) -->
 
 Months are entered as `YYYY-MM`, for example `2026-09`.
 
@@ -147,6 +118,8 @@ CsharpMilestoneProject/
 │   ├── MoneyTracker.Core/         # domain models and business logic
 │   ├── MoneyTracker.Infrastructure/  # JSON persistence
 │   └── MoneyTracker.ConsoleApp/   # console UI and composition root
+│       └── UI/                    # MainMenu, TransactionMenu, ConsoleInput,
+│                                   # TransactionTable, ConsoleMessage, SlowConsole
 └── tests/
     └── MoneyTracker.Core.Tests/   # xunit tests
 ```
@@ -300,11 +273,15 @@ Planned, designed for, but not yet implemented:
       in-memory fake repository and touch no files
 - [ ] **Colourful console UI** — a full theming pass using
       [Spectre.Console](https://spectreconsole.net/). All rendering is already isolated in
-      `TransactionTable` and `ConsoleMessage`, so only those change
+      `TransactionTable` and `ConsoleMessage`, so only those change. A small version of this
+      already exists (`ConsoleMessage`/`SlowConsole` colour and pacing plain `System.Console`
+      output) without the Spectre.Console dependency
 - [ ] **User login** (deliberately insecure — no password hashing, this is a learning exercise)
       — one JSON file per user at `data/{username}.json`. The repository already takes a file
       path, so the change is confined to `Program.cs`
 
 ---
 
-<!-- TODO: add a licence section if your course requires one -->
+## License
+
+MIT — see [`LICENSE`](LICENSE).

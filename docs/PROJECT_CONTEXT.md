@@ -31,6 +31,8 @@ Extra features included for flair:
 - Atomic file writes, so a crash mid-save cannot corrupt the data file.
 - Colored success/warning/error messages.
 - Amount input accepts both `1234,50` and `1234.50`.
+- Paginated transaction lists (13 rows/page), with filter, sort field and sort direction
+  changeable in place.
 
 Planned for later (see §9): unit tests, a full colorful UI overhaul, per-user login.
 
@@ -74,9 +76,12 @@ MoneyTracker/
 │       ├── Program.cs                    # composition root only
 │       └── UI/
 │           ├── MainMenu.cs
+│           ├── TransactionMenu.cs
 │           ├── ConsoleInput.cs
 │           ├── TransactionTable.cs
-│           └── ConsoleMessage.cs
+│           ├── ConsoleMessage.cs
+│           ├── SlowConsole.cs
+│           └── UserCancelledException.cs
 └── tests/
     └── MoneyTracker.Core.Tests/          # xunit (added now, filled in later)
 ```
@@ -135,6 +140,7 @@ reading the diff — not by the build.
 | `Amount` | `decimal` | Always **positive**, rounded to 2 decimals |
 | `Month` | `YearMonth` | Year + month |
 | `SignedAmount` | `decimal` | **abstract** — the polymorphic hook |
+| `TypeName` | `string` | **abstract** — display label ("Income" / "Expense"), so the UI never branches on type |
 
 `Income.SignedAmount => Amount`, `Expense.SignedAmount => -Amount`.
 
@@ -159,7 +165,7 @@ would invent precision the user never entered.
 
 - `ToString()` → `"2026-09"`
 - `TryParse` accepts `"2026-09"`, `"2026-9"`
-- Validation: year 1900–2999, month 1–12
+- Validation: year 1900–2100, month 1–12
 
 ### `BalanceSummary`
 
@@ -185,9 +191,12 @@ persists after every mutation.
 public IReadOnlyList<Transaction> GetTransactions(
     TransactionFilter filter = TransactionFilter.All,
     SortField sortBy = SortField.Month,
-    SortDirection direction = SortDirection.Ascending);
+    SortDirection direction = SortDirection.Descending);
 
+public decimal GetTotal(TransactionFilter filter = TransactionFilter.All);
 public Transaction? FindById(int id);
+public IReadOnlyList<Transaction> GetTransactionsForMonth(YearMonth? month = null);
+public IReadOnlyList<YearMonth> GetAvailableMonths();
 public Income  AddIncome (string title, decimal amount, YearMonth month);
 public Expense AddExpense(string title, decimal amount, YearMonth month);
 public Transaction Update(int id, string title, decimal amount, YearMonth month);
@@ -284,11 +293,16 @@ var service = new TransactionService(repository);
 new MainMenu(service).Run();
 ```
 
-Main menu:
+`Program.cs` opens with an ASCII-art "Dragon's Ledger" intro (paced by `SlowConsole`, purely
+decorative), then hands off to `MainMenu`:
 
 ```
-=== MoneyTracker ===
-Balance: 22 500,00 kr   (income 32 000,00 kr · expenses 9 500,00 kr)
+=============================================
+   DRAGON'S LEDGER - MONEY TRACKING SYSTEM
+=============================================
+
+Balance for September (2026): 22 500 kr
+(income 32 000 kr · expenses 9 500 kr)
 
 1. Show transactions
 2. Add income
@@ -301,13 +315,16 @@ Balance: 22 500,00 kr   (income 32 000,00 kr · expenses 9 500,00 kr)
 Select option (0 - 6):
 ```
 
-Listing screen asks for filter, then sort field, then direction, then renders:
+`MainMenu` owns only the top-level loop; each of the six options is delegated to
+`TransactionMenu`. "Show transactions" lets the filter, sort field and sort direction be changed
+in place without leaving the screen, and every list (transactions, monthly summary) is paginated
+13 rows at a time. The rendered table:
 
 ```
-  ID  Type      Title                    Month      Amount
-  ──  ────────  ───────────────────────  ───────  ──────────
-   1  Income    Lön                      2026-09   32 000,00
-   2  Expense   Hyra                     2026-09   -9 500,00
+  ID   Type      Title    Month       Year   Amount (SEK)
+  ---  --------  -------  ----------  -----  ------------
+  1    Income    Lön      September   2026        32 000
+  2    Expense   Hyra     September   2026        -9 500
 ```
 
 ### UI rules
@@ -317,6 +334,9 @@ Listing screen asks for filter, then sort field, then direction, then renders:
 - **Edit prompts show the current value** and keep it when the user presses Enter on an empty line.
 - **Delete asks for confirmation** and shows the transaction before removing it.
 - **`ConsoleMessage`** owns every colour change and always restores `Console.ResetColor()`.
+- **`UserCancelledException`** unwinds a menu when the user types "q" or the input stream closes
+  (e.g. piped input); `ConsoleInput.TryRun` catches it so cancelling returns to the previous menu
+  instead of propagating as an unhandled error.
 - **No business logic in `UI/`** — no sorting, no filtering, no arithmetic. The UI asks the
   service and renders the answer.
 - Amount parsing accepts `,` and `.` as the decimal separator.
@@ -334,9 +354,9 @@ Validation happens twice, on purpose:
 
 | Rule | Violation |
 |---|---|
-| Title not null/whitespace, ≤ 60 chars | `ArgumentException` |
+| Title not null/whitespace, ≤ 35 chars | `ArgumentException` |
 | Amount > 0 and ≤ 1 000 000 000 | `ArgumentOutOfRangeException` |
-| Month valid (1900–2999, 1–12) | `ArgumentOutOfRangeException` |
+| Month valid (1900–2100, 1–12) | `ArgumentOutOfRangeException` |
 | ID exists | `TransactionNotFoundException` |
 | File unreadable/corrupt | `DataStoreException` |
 
