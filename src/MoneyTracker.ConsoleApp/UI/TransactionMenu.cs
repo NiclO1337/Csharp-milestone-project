@@ -45,8 +45,13 @@ internal sealed class TransactionMenu
             var tableWidth = TransactionTable.Display(transactions.Skip(page * PageSize).Take(PageSize).ToList());
             if (tableWidth is not null)
             {
-                var total = _service.GetTotal(filter).ToString("N0", s_currency);
-                Console.WriteLine($"Total: {total}".PadLeft(tableWidth.Value));
+                var total = _service.GetTotal(filter);
+                const string prefix = "Total: ";
+                var amountText = total.ToString("C0", s_currency);
+                Console.Write(new string(' ', Math.Max(0, tableWidth.Value - prefix.Length - amountText.Length)));
+                Console.Write(prefix);
+                ConsoleMessage.WriteColored(amountText, total < 0 ? ConsoleColor.Red : ConsoleColor.Green);
+                Console.WriteLine();
             }
 
             Console.WriteLine($"Page {page + 1} of {pageCount}");
@@ -399,8 +404,7 @@ internal sealed class TransactionMenu
             var pageCount = Math.Max(1, (transactions.Count + PageSize - 1) / PageSize);
 
             ConsoleMessage.Heading("Monthly Summary");
-            Console.WriteLine(month is null ? "All time" : $"{month}");
-            PrintSummary(_service.GetSummary(month));
+            PrintSummary(month, _service.GetSummary(month));
             Console.WriteLine();
             TransactionTable.Display(transactions.Skip(page * PageSize).Take(PageSize).ToList());
             Console.WriteLine($"\nPage {page + 1} of {pageCount}");
@@ -461,10 +465,18 @@ internal sealed class TransactionMenu
             currentValue: null);
     }
 
-    private static void PrintSummary(BalanceSummary summary)
+    private static void PrintSummary(YearMonth? month, BalanceSummary summary)
     {
+        var label = month is null
+            ? "all time"
+            : $"{new DateOnly(month.Value.Year, month.Value.Month, 1).ToString("MMMM", CultureInfo.InvariantCulture)} ({month.Value.Year})";
+
+        Console.Write($"Balance for {label}: ");
+        ConsoleMessage.WriteColored(
+            summary.Balance.ToString("C0", s_currency),
+            summary.Balance < 0 ? ConsoleColor.Red : ConsoleColor.Green);
+        Console.WriteLine();
         Console.WriteLine(
-            $"Balance: {summary.Balance.ToString("C0", s_currency)}   " +
             $"(income {summary.TotalIncome.ToString("C0", s_currency)} · expenses {summary.TotalExpenses.ToString("C0", s_currency)})");
     }
 

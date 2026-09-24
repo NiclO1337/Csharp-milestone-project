@@ -51,7 +51,7 @@ internal sealed class MainMenu
         while (true)
         {
             ConsoleMessage.MainHeading("DRAGON'S LEDGER - MONEY TRACKING SYSTEM");
-            PrintSummary(_service.GetSummary());
+            PrintSummary(_service.GetSummary(YearMonth.Current));
             Console.WriteLine();
 
             var choice = ConsoleInput.SelectMenuOption(menuItems, "Quit");
@@ -87,8 +87,15 @@ internal sealed class MainMenu
 
     private static void PrintSummary(BalanceSummary summary)
     {
+        var current = YearMonth.Current;
+        var date = new DateOnly(current.Year, current.Month, 1);
+
+        Console.Write($"Balance for {date.ToString("MMMM", CultureInfo.InvariantCulture)} ({current.Year}): ");
+        ConsoleMessage.WriteColored(
+            summary.Balance.ToString("C0", s_currency),
+            summary.Balance < 0 ? ConsoleColor.Red : ConsoleColor.Green);
+        Console.WriteLine();
         Console.WriteLine(
-            $"Balance: {summary.Balance.ToString("C0", s_currency)}   " +
             $"(income {summary.TotalIncome.ToString("C0", s_currency)} · expenses {summary.TotalExpenses.ToString("C0", s_currency)})");
     }
 }
