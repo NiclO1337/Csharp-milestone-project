@@ -159,7 +159,7 @@ internal sealed class TransactionMenu
             currentValue: YearMonth.Current);
 
         var transaction = add(title, amount, month);
-        ConsoleMessage.DisplaySuccessMessage($"{transaction.TypeName} '{transaction.Title}' added.");
+        ConsoleMessage.DisplaySuccessMessage($"{transaction.TypeName} '{transaction.Title}' added successfully.");
         return true;
     }
 
@@ -261,7 +261,7 @@ internal sealed class TransactionMenu
         try
         {
             _service.Update(id, title, amount, month);
-            ConsoleMessage.DisplaySuccessMessage("Transaction updated.");
+            ConsoleMessage.DisplaySuccessMessage("Transaction updated successfully.");
         }
         catch (TransactionNotFoundException)
         {
@@ -291,7 +291,7 @@ internal sealed class TransactionMenu
         try
         {
             _service.Remove(id);
-            ConsoleMessage.DisplaySuccessMessage("Transaction removed.");
+            ConsoleMessage.DisplaySuccessMessage("Transaction removed successfully.");
         }
         catch (TransactionNotFoundException)
         {
