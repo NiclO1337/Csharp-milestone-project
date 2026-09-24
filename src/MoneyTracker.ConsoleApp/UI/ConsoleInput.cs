@@ -157,11 +157,19 @@ internal static class ConsoleInput
     {
         var values = Enum.GetValues<T>();
         var menuItems = values
-            .Select(value => value.Equals(current) ? $"{value} (current)" : value.ToString())
+            .Select(value => value.Equals(current) ? $"{EnumDisplayName(value)} (current)" : EnumDisplayName(value))
             .ToArray();
 
         var choice = SelectMenuOption(menuItems, "Back");
         return choice == 0 ? current : values[choice - 1];
+    }
+
+    /// <summary>Splits an enum value's PascalCase name into lower-cased words, e.g. <c>IncomesOnly</c> → "Incomes only".</summary>
+    internal static string EnumDisplayName<T>(T value)
+        where T : struct, Enum
+    {
+        var name = value.ToString();
+        return string.Concat(name.Select((c, i) => i > 0 && char.IsUpper(c) ? $" {char.ToLowerInvariant(c)}" : c.ToString()));
     }
 
     /// <summary>

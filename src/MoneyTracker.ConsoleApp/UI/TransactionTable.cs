@@ -14,27 +14,36 @@ internal static class TransactionTable
 
     private static readonly CultureInfo s_currency = CultureInfo.GetCultureInfo("sv-SE");
 
-    internal static void Display(IReadOnlyList<Transaction> transactions)
+    /// <summary>
+    /// Renders the table and returns its usable width — <c>header.Length - ColumnPadding</c>,
+    /// the same span the border rules cover — so callers can align extra content (e.g. a total)
+    /// to the table's edge. Returns <see langword="null"/> if there was nothing to render.
+    /// </summary>
+    internal static int? Display(IReadOnlyList<Transaction> transactions)
     {
         if (transactions.Count == 0)
         {
             ConsoleMessage.DisplayWarningMessage("No transactions to show.");
-            return;
+            return null;
         }
 
         var rows = transactions.Select(ToRow).ToList();
         var widths = MeasureColumns(rows);
         var header = FormatRow(new Row("ID", "Type", "Title", "Month", "Amount (SEK)"), widths);
 
+        var tableWidth = header.Length - ColumnPadding;
+
         Console.WriteLine(header);
-        Console.WriteLine(new string('-', header.Length - ColumnPadding));
+        Console.WriteLine(new string('-', tableWidth));
 
         foreach (var row in rows)
         {
             Console.WriteLine(FormatRow(row, widths));
         }
 
-        Console.WriteLine(new string('-', header.Length - ColumnPadding));
+        Console.WriteLine(new string('-', tableWidth));
+
+        return tableWidth;
     }
 
     private static Row ToRow(Transaction transaction) => new(

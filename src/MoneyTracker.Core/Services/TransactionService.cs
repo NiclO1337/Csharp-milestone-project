@@ -33,12 +33,7 @@ public sealed class TransactionService
         SortField sortBy = SortField.Month,
         SortDirection direction = SortDirection.Descending)
     {
-        IEnumerable<Transaction> filtered = filter switch
-        {
-            TransactionFilter.IncomesOnly => _transactions.Where(t => t.SignedAmount > 0),
-            TransactionFilter.ExpensesOnly => _transactions.Where(t => t.SignedAmount < 0),
-            _ => _transactions,
-        };
+        var filtered = FilterBy(filter);
 
         IOrderedEnumerable<Transaction> sorted = (sortBy, direction) switch
         {
@@ -56,6 +51,20 @@ public sealed class TransactionService
 
         return sorted.ToList();
     }
+
+    /// <summary>
+    /// Sums <c>SignedAmount</c> across transactions matching <paramref name="filter"/> — the
+    /// incomes total, the expenses total (negative), or the net balance when both are included.
+    /// </summary>
+    public decimal GetTotal(TransactionFilter filter = TransactionFilter.All) =>
+        FilterBy(filter).Sum(t => t.SignedAmount);
+
+    private IEnumerable<Transaction> FilterBy(TransactionFilter filter) => filter switch
+    {
+        TransactionFilter.IncomesOnly => _transactions.Where(t => t.SignedAmount > 0),
+        TransactionFilter.ExpensesOnly => _transactions.Where(t => t.SignedAmount < 0),
+        _ => _transactions,
+    };
 
     /// <summary>Finds a transaction by ID, or <see langword="null"/> if none exists.</summary>
     public Transaction? FindById(int id) => _transactions.FirstOrDefault(t => t.Id == id);

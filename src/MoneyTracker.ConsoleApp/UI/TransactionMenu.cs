@@ -42,15 +42,21 @@ internal sealed class TransactionMenu
             var pageCount = Math.Max(1, (transactions.Count + PageSize - 1) / PageSize);
 
             ConsoleMessage.Heading("Show Transactions");
-            TransactionTable.Display(transactions.Skip(page * PageSize).Take(PageSize).ToList());
-            Console.WriteLine($"\nPage {page + 1} of {pageCount}");
+            var tableWidth = TransactionTable.Display(transactions.Skip(page * PageSize).Take(PageSize).ToList());
+            if (tableWidth is not null)
+            {
+                var total = _service.GetTotal(filter).ToString("N0", s_currency);
+                Console.WriteLine($"Total: {total}".PadLeft(tableWidth.Value));
+            }
+
+            Console.WriteLine($"Page {page + 1} of {pageCount}");
             Console.WriteLine();
 
             string[] menuItems =
             [
                 "Previous page",
                 "Next page\n",
-                $"Change filter (current: {filter})",
+                $"Change filter (current: {ConsoleInput.EnumDisplayName(filter)})",
                 $"Change sort (current: {sortBy})",
                 $"Toggle direction (current: {direction})",
             ];
@@ -96,6 +102,7 @@ internal sealed class TransactionMenu
     private static (T Value, int Page) ApplyChange<T>(T current, int page)
         where T : struct, Enum
     {
+        Console.WriteLine();
         var updated = ConsoleInput.SelectEnumOption(current);
         return updated.Equals(current) ? (current, page) : (updated, 0);
     }
