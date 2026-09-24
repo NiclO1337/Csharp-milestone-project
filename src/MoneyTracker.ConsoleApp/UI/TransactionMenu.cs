@@ -129,7 +129,7 @@ internal sealed class TransactionMenu
 
     /// <summary>
     /// Returns <see langword="true"/> if a transaction was added, <see langword="false"/> if the
-    /// user backed out at title selection ("0. Cancel") before reaching any "q to cancel" step.
+    /// user backed out at title selection ("0. Cancel") before reaching any "enter Q to cancel" step.
     /// </summary>
     private static bool AddTransaction(string heading, IReadOnlyList<string> titlePresets, Func<string, decimal, YearMonth, Transaction> add)
     {
@@ -146,12 +146,12 @@ internal sealed class TransactionMenu
         }
 
         var amount = ConsoleInput.ValidateInput(
-            "Amount in SEK (q to cancel): ",
+            "Amount in SEK (enter Q to cancel): ",
             ValidateAmount,
             $"Invalid amount, must be a number greater than 0 and less than {Transaction.MaxAmount}.",
             allowCancel: true);
         var month = ConsoleInput.ValidateInput(
-            "Month yyyy-MM (q to cancel or just press Enter for current month): ",
+            "Month yyyy-MM (enter Q to cancel or just press Enter for current month): ",
             ValidateMonth,
             "Invalid month, expected format yyyy-MM.",
             allowCancel: true,
@@ -174,7 +174,7 @@ internal sealed class TransactionMenu
         }
 
         return choice == menuItems.Length
-            ? ConsoleInput.ValidateInput("Title (q to cancel): ", Transaction.MaxTitleLength, allowCancel: true)
+            ? ConsoleInput.ValidateInput("Title (enter Q to cancel): ", Transaction.MaxTitleLength, allowCancel: true)
             : presets[choice - 1];
     }
 
@@ -233,14 +233,14 @@ internal sealed class TransactionMenu
 
     private static string PromptTitle(Transaction transaction) =>
         ConsoleInput.ValidateInput(
-            "New title (just press Enter to keep current, q to cancel): ",
+            "New title (just press Enter to keep current, enter Q to cancel): ",
             Transaction.MaxTitleLength,
             allowCancel: true,
             currentValue: transaction.Title);
 
     private static decimal PromptAmount(Transaction transaction) =>
         ConsoleInput.ValidateInput(
-            "New amount in SEK (just press Enter to keep current, q to cancel): ",
+            "New amount in SEK (just press Enter to keep current, enter Q to cancel): ",
             ValidateAmount,
             $"Invalid amount, must be a number greater than 0 and less than {Transaction.MaxAmount}.",
             allowCancel: true,
@@ -249,7 +249,7 @@ internal sealed class TransactionMenu
 
     private static YearMonth PromptMonth(Transaction transaction) =>
         ConsoleInput.ValidateInput(
-            "New month yyyy-MM (just press Enter to keep current, q to cancel): ",
+            "New month yyyy-MM (just press Enter to keep current, enter Q to cancel): ",
             ValidateMonth,
             "Invalid month, expected format yyyy-MM.",
             allowCancel: true,
@@ -371,7 +371,7 @@ internal sealed class TransactionMenu
         try
         {
             var id = ConsoleInput.ValidateInput(
-                "Transaction ID (q to cancel): ",
+                "Transaction ID (enter Q to cancel): ",
                 ConsoleInput.ValidateIntegerRange(1, int.MaxValue),
                 "Invalid input, enter a positive number.",
                 allowCancel: true);
@@ -457,7 +457,7 @@ internal sealed class TransactionMenu
         }
 
         return ConsoleInput.ValidateInput<YearMonth?>(
-            "Month yyyy-MM (Enter for all time, q to cancel): ",
+            "Month yyyy-MM (Enter for all time, or Q to cancel): ",
             ValidateOptionalMonth,
             "Invalid month, expected format yyyy-MM.",
             allowCancel: true,

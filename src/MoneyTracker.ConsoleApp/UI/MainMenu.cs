@@ -63,7 +63,7 @@ internal sealed class MainMenu
                     break;
                 case 2:
                     // Func<bool> overload: pauses unless AddIncome silently backed out at title
-                    // selection ("0. Cancel") without reaching a "q to cancel" step.
+                    // selection ("0. Cancel") without reaching a "Q to cancel" step.
                     ConsoleInput.TryRun(_transactionMenu.AddIncome);
                     break;
                 case 3:
