@@ -29,8 +29,7 @@ internal static class TransactionTable
 
         var rows = transactions.Select(ToRow).ToList();
         var widths = MeasureColumns(rows);
-        var header = FormatRow(new Row("ID", "Type", "Title", "Month", "Year", "Amount (SEK)"), widths);
-        
+        var header = FormatRow(new Row("ID", "Type", "Title", "Month", "Year", "Amount (SEK)", 0m), widths);
         var tableWidth = header.Length - ColumnPadding;
 
         Console.WriteLine(header);
@@ -38,7 +37,9 @@ internal static class TransactionTable
 
         foreach (var row in rows)
         {
-            Console.WriteLine(FormatRow(row, widths));
+            Console.Write(FormatRowPrefix(row, widths));
+            ConsoleMessage.WriteColored(PadNumeric(row.Amount, widths.Amount), row.SignedAmount < 0 ? ConsoleColor.Red : ConsoleColor.Green);
+            Console.WriteLine();
         }
 
         Console.WriteLine(new string('-', tableWidth));
@@ -56,7 +57,8 @@ internal static class TransactionTable
             transaction.Title,
             date.ToString("MMMM", CultureInfo.InvariantCulture),
             date.ToString("yyyy", CultureInfo.InvariantCulture),
-            transaction.SignedAmount.ToString("N0", s_currency));
+            transaction.SignedAmount.ToString("N0", s_currency),
+            transaction.SignedAmount);
     }
 
     private static ColumnWidths MeasureColumns(IReadOnlyList<Row> rows) => new(
@@ -68,12 +70,14 @@ internal static class TransactionTable
         Amount: Math.Max("Amount (SEK)".Length, rows.Max(r => r.Amount.Length)) + ColumnPadding);
 
     private static string FormatRow(Row row, ColumnWidths widths) =>
+        FormatRowPrefix(row, widths) + PadNumeric(row.Amount, widths.Amount);
+
+    private static string FormatRowPrefix(Row row, ColumnWidths widths) =>
         PadNumeric(row.Id, widths.Id)
         + row.Type.PadRight(widths.Type)
         + row.Title.PadRight(widths.Title)
         + row.Month.PadRight(widths.Month)
-        + row.Year.PadRight(widths.Year)
-        + PadNumeric(row.Amount, widths.Amount);
+        + row.Year.PadRight(widths.Year);
 
     /// <summary>
     /// Right-aligns <paramref name="value"/>, then appends the column gap as trailing spaces.
@@ -84,7 +88,7 @@ internal static class TransactionTable
     private static string PadNumeric(string value, int totalWidth) =>
         value.PadLeft(totalWidth - ColumnPadding) + new string(' ', ColumnPadding);
 
-    private readonly record struct Row(string Id, string Type, string Title, string Month, string Year, string Amount);
+    private readonly record struct Row(string Id, string Type, string Title, string Month, string Year, string Amount, decimal SignedAmount);
 
     private readonly record struct ColumnWidths(int Id, int Type, int Title, int Month, int Year, int Amount);
 }

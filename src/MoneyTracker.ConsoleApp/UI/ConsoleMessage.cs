@@ -10,7 +10,7 @@ internal static class ConsoleMessage
 {
     internal static void DisplayErrorMessage(string message)
     {
-        Console.ForegroundColor = ConsoleColor.Red;
+        Console.ForegroundColor = ConsoleColor.DarkRed;
         Console.WriteLine(message);
         Console.ResetColor();
     }
@@ -26,6 +26,18 @@ internal static class ConsoleMessage
     {
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine(message);
+        Console.ResetColor();
+    }
+
+    /// <summary>
+    /// Writes <paramref name="text"/> in <paramref name="color"/> without a trailing newline, so
+    /// it can be combined with plain-colour text on the same line (e.g. one coloured column in
+    /// an otherwise uncoloured table row).
+    /// </summary>
+    internal static void WriteColored(string text, ConsoleColor color)
+    {
+        Console.ForegroundColor = color;
+        Console.Write(text);
         Console.ResetColor();
     }
 
