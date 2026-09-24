@@ -12,7 +12,7 @@ namespace MoneyTracker.Core.Models;
 public abstract class Transaction
 {
     /// <summary>The maximum allowed length of <see cref="Title"/>.</summary>
-    public const int MaxTitleLength = 60;
+    public const int MaxTitleLength = 35;
 
     /// <summary>The maximum allowed value of <see cref="Amount"/>.</summary>
     public const decimal MaxAmount = 1_000_000_000m;

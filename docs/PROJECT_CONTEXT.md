@@ -131,7 +131,7 @@ reading the diff — not by the build.
 | Member | Type | Notes |
 |---|---|---|
 | `Id` | `int` | Auto-increment, assigned by `TransactionService`, unique and stable |
-| `Title` | `string` | Trimmed, non-empty, max 60 chars |
+| `Title` | `string` | Trimmed, non-empty, max 35 chars |
 | `Amount` | `decimal` | Always **positive**, rounded to 2 decimals |
 | `Month` | `YearMonth` | Year + month |
 | `SignedAmount` | `decimal` | **abstract** — the polymorphic hook |

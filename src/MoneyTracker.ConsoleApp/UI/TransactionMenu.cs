@@ -12,7 +12,7 @@ namespace MoneyTracker.ConsoleApp.UI;
 /// </summary>
 internal sealed class TransactionMenu
 {
-    private const int PageSize = 10;
+    private const int PageSize = 13;
 
     private static readonly CultureInfo s_currency = CultureInfo.GetCultureInfo("sv-SE");
 

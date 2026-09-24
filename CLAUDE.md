@@ -74,7 +74,7 @@ guards its own invariants anyway.
 
 | Rule | Throw |
 |---|---|
-| Title non-blank, ≤ 60 chars | `ArgumentException` |
+| Title non-blank, ≤ 35 chars | `ArgumentException` |
 | Amount > 0, ≤ 1 000 000 000 | `ArgumentOutOfRangeException` |
 | Year 1900–2999, month 1–12 | `ArgumentOutOfRangeException` |
 | Unknown ID | `TransactionNotFoundException` |
