@@ -29,8 +29,8 @@ internal static class TransactionTable
 
         var rows = transactions.Select(ToRow).ToList();
         var widths = MeasureColumns(rows);
-        var header = FormatRow(new Row("ID", "Type", "Title", "Month", "Amount (SEK)"), widths);
-
+        var header = FormatRow(new Row("ID", "Type", "Title", "Month", "Year", "Amount (SEK)"), widths);
+        
         var tableWidth = header.Length - ColumnPadding;
 
         Console.WriteLine(header);
@@ -46,18 +46,25 @@ internal static class TransactionTable
         return tableWidth;
     }
 
-    private static Row ToRow(Transaction transaction) => new(
-        transaction.Id.ToString(CultureInfo.InvariantCulture),
-        transaction.TypeName,
-        transaction.Title,
-        transaction.Month.ToString(),
-        transaction.SignedAmount.ToString("N0", s_currency));
+    private static Row ToRow(Transaction transaction)
+    {
+        var date = new DateOnly(transaction.Month.Year, transaction.Month.Month, 1);
+
+        return new Row(
+            transaction.Id.ToString(CultureInfo.InvariantCulture),
+            transaction.TypeName,
+            transaction.Title,
+            date.ToString("MMMM", CultureInfo.InvariantCulture),
+            date.ToString("yyyy", CultureInfo.InvariantCulture),
+            transaction.SignedAmount.ToString("N0", s_currency));
+    }
 
     private static ColumnWidths MeasureColumns(IReadOnlyList<Row> rows) => new(
         Id: Math.Max("ID".Length, rows.Max(r => r.Id.Length)) + ColumnPadding,
         Type: Math.Max("Type".Length, rows.Max(r => r.Type.Length)) + ColumnPadding,
         Title: Math.Max("Title".Length, rows.Max(r => r.Title.Length)) + ColumnPadding,
         Month: Math.Max("Month".Length, rows.Max(r => r.Month.Length)) + ColumnPadding,
+        Year: Math.Max("Year".Length, rows.Max(r => r.Year.Length)) + ColumnPadding,
         Amount: Math.Max("Amount (SEK)".Length, rows.Max(r => r.Amount.Length)) + ColumnPadding);
 
     private static string FormatRow(Row row, ColumnWidths widths) =>
@@ -65,6 +72,7 @@ internal static class TransactionTable
         + row.Type.PadRight(widths.Type)
         + row.Title.PadRight(widths.Title)
         + row.Month.PadRight(widths.Month)
+        + row.Year.PadRight(widths.Year)
         + PadNumeric(row.Amount, widths.Amount);
 
     /// <summary>
@@ -76,7 +84,7 @@ internal static class TransactionTable
     private static string PadNumeric(string value, int totalWidth) =>
         value.PadLeft(totalWidth - ColumnPadding) + new string(' ', ColumnPadding);
 
-    private readonly record struct Row(string Id, string Type, string Title, string Month, string Amount);
+    private readonly record struct Row(string Id, string Type, string Title, string Month, string Year, string Amount);
 
-    private readonly record struct ColumnWidths(int Id, int Type, int Title, int Month, int Amount);
+    private readonly record struct ColumnWidths(int Id, int Type, int Title, int Month, int Year, int Amount);
 }
