@@ -5,7 +5,6 @@ using MoneyTracker.Infrastructure.Json;
 
 SlowConsole.Install();
 
-Console.ForegroundColor = ConsoleColor.DarkYellow;
 foreach (string line in new[]
 {
     "",
@@ -30,14 +29,13 @@ foreach (string line in new[]
     "            `  `                                       -Tua Xiong",
 })
 {
-    Console.WriteLine(line);
+    ConsoleMessage.WriteColoredLine(line, ConsoleColor.DarkYellow);
 }
 
-SlowConsole.TypeTextSlow("\nWelcome to Dragon's Ledger - where every coin counts.\n");
-SlowConsole.TypeTextSlow("\nA treasure-keeper's ledger for tracking your gold:\n");
-SlowConsole.TypeTextSlow("mind your mint, weigh your winnings, spot the coin\n");
-SlowConsole.TypeTextSlow("that got away, and keep your hoard from gathering dust.\n");
-Console.ResetColor();
+ConsoleMessage.WriteColoredSlow("\nWelcome to Dragon's Ledger - where every coin counts.\n", ConsoleColor.DarkYellow);
+ConsoleMessage.WriteColoredSlow("\nA treasure-keeper's ledger for tracking your gold:\n", ConsoleColor.DarkYellow);
+ConsoleMessage.WriteColoredSlow("mind your mint, weigh your winnings, spot the coin\n", ConsoleColor.DarkYellow);
+ConsoleMessage.WriteColoredSlow("that got away, and keep your hoard from gathering dust.\n", ConsoleColor.DarkYellow);
 ConsoleInput.Pause();
 
 // AppContext.BaseDirectory is bin/Debug/net10.0/; walk back up to src/ so the data file
@@ -59,9 +57,8 @@ catch (DataStoreException ex)
 
 ConsoleMessage.Heading("Closing application");
 
-Console.ForegroundColor = ConsoleColor.DarkYellow;
-SlowConsole.TypeTextSlow("The hoard is secure and the ledger is closed... for now.\n\n");
-SlowConsole.TypeTextSlow("Farewell, treasure keeper!\n\n\n");
+ConsoleMessage.WriteColoredSlow("The hoard is secure and the ledger is closed... for now.\n\n", ConsoleColor.DarkYellow);
+ConsoleMessage.WriteColoredSlow("Farewell, treasure keeper!\n\n\n", ConsoleColor.DarkYellow);
 
 foreach (string line in new[]
 {
@@ -72,7 +69,6 @@ foreach (string line in new[]
     "      `- ,`- '            `--..__,,---'   hh",
 })
 {
-    Console.WriteLine(line);
+    ConsoleMessage.WriteColoredLine(line, ConsoleColor.DarkYellow);
 }
-Console.ResetColor();
-Console.WriteLine();
+ConsoleMessage.NewLine();

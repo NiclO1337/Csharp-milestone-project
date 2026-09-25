@@ -51,6 +51,24 @@ internal static class ConsoleMessage
         Console.ResetColor();
     }
 
+    /// <summary>
+    /// Writes <paramref name="text"/> in <paramref name="color"/> with <see cref="SlowConsole"/>'s
+    /// typewriter effect. Delegates the character-by-character pacing to <see cref="SlowConsole"/>
+    /// so this stays the only place that sets and resets colour.
+    /// </summary>
+    internal static void WriteColoredSlow(string text, ConsoleColor color)
+    {
+        Console.ForegroundColor = color;
+        SlowConsole.TypeTextSlow(text);
+        Console.ResetColor();
+    }
+
+    /// <summary>
+    /// Writes a blank line. Exists so callers outside <c>UI/</c> never need to call
+    /// <see cref="Console.WriteLine()"/> directly.
+    /// </summary>
+    internal static void NewLine() => Console.WriteLine();
+
     internal static void Heading(string title, ConsoleColor color = ConsoleColor.DarkCyan)
     {
         ClearScreen();
