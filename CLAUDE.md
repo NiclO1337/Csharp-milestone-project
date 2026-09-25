@@ -76,7 +76,7 @@ guards its own invariants anyway.
 |---|---|
 | Title non-blank, ≤ 35 chars | `ArgumentException` |
 | Amount > 0, ≤ 1 000 000 000 | `ArgumentOutOfRangeException` |
-| Year 1900–2100, month 1–12 | `ArgumentOutOfRangeException` |
+| Year within current year ± 1, month 1–12 | `ArgumentOutOfRangeException` |
 | Unknown ID | `TransactionNotFoundException` |
 
 Invalid console input is a normal event — re-prompt, don't throw.

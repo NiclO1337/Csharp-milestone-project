@@ -167,7 +167,7 @@ would invent precision the user never entered.
 
 - `ToString()` → `"2026-09"`
 - `TryParse` accepts `"2026-09"`, `"2026-9"`
-- Validation: year 1900–2100, month 1–12
+- Validation: year within current year ± 1 (computed from the system clock), month 1–12
 
 ### `BalanceSummary`
 
@@ -370,7 +370,7 @@ Validation happens twice, on purpose:
 |---|---|
 | Title not null/whitespace, ≤ 35 chars | `ArgumentException` |
 | Amount > 0 and ≤ 1 000 000 000 | `ArgumentOutOfRangeException` |
-| Month valid (1900–2100, 1–12) | `ArgumentOutOfRangeException` |
+| Month valid (year within current year ± 1, 1–12) | `ArgumentOutOfRangeException` |
 | ID exists | `TransactionNotFoundException` |
 | File unreadable/corrupt | `DataStoreException` |
 

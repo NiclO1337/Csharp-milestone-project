@@ -153,7 +153,7 @@ internal sealed class TransactionMenu
         var month = ConsoleInput.ValidateInput(
             "Month yyyy-MM (enter Q to cancel or just press Enter for current month): ",
             ValidateMonth,
-            "Invalid month, expected format yyyy-MM.",
+            $"Invalid month, expected format yyyy-MM with year between {YearMonth.MinYear} and {YearMonth.MaxYear}.",
             allowCancel: true,
             hasCurrentValue: true,
             currentValue: YearMonth.Current);
@@ -251,7 +251,7 @@ internal sealed class TransactionMenu
         ConsoleInput.ValidateInput(
             "New month yyyy-MM (just press Enter to keep current, enter Q to cancel): ",
             ValidateMonth,
-            "Invalid month, expected format yyyy-MM.",
+            $"Invalid month, expected format yyyy-MM with year between {YearMonth.MinYear} and {YearMonth.MaxYear}.",
             allowCancel: true,
             hasCurrentValue: true,
             currentValue: transaction.Month);
@@ -341,8 +341,8 @@ internal sealed class TransactionMenu
             [
                 "Previous page",
                 "Next page\n",
-                $"Enter Transaction ID to {actionLabel}",
                 searchTerm is null ? "Search by title" : "Change search term",
+                $"Enter Transaction ID to {actionLabel}",
             ];
 
             if (searchTerm is not null)
@@ -512,7 +512,7 @@ internal sealed class TransactionMenu
         return ConsoleInput.ValidateInput<YearMonth?>(
             "Month yyyy-MM (Enter for all time, or Q to cancel): ",
             ValidateOptionalMonth,
-            "Invalid month, expected format yyyy-MM.",
+            $"Invalid month, expected format yyyy-MM with year between {YearMonth.MinYear} and {YearMonth.MaxYear}.",
             allowCancel: true,
             hasCurrentValue: true,
             currentValue: null);

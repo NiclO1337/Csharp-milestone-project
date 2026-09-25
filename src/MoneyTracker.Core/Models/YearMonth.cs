@@ -6,11 +6,11 @@ namespace MoneyTracker.Core.Models;
 /// </summary>
 public readonly record struct YearMonth : IComparable<YearMonth>
 {
-    /// <summary>The earliest year a <see cref="YearMonth"/> may hold.</summary>
-    public const int MinYear = 1900;
+    /// <summary>The earliest year a <see cref="YearMonth"/> may hold: one year before the current year.</summary>
+    public static int MinYear => DateTime.Now.Year - 1;
 
-    /// <summary>The latest year a <see cref="YearMonth"/> may hold.</summary>
-    public const int MaxYear = 2100;
+    /// <summary>The latest year a <see cref="YearMonth"/> may hold: one year after the current year.</summary>
+    public static int MaxYear => DateTime.Now.Year + 1;
 
     /// <summary>The year component, between <see cref="MinYear"/> and <see cref="MaxYear"/>.</summary>
     public int Year { get; }
