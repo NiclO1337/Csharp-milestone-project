@@ -40,7 +40,7 @@ SlowConsole.TypeTextSlow("that got away, and keep your hoard from gathering dust
 Console.ResetColor();
 ConsoleInput.Pause();
 
-// AppContext.BaseDirectory is bin/<Config>/net10.0/; walk back up to src/ so the data file
+// AppContext.BaseDirectory is bin/Debug/net10.0/; walk back up to src/ so the data file
 // lives in the source tree and gets committed, not left behind in the gitignored build output.
 var path = Path.GetFullPath(Path.Combine(
     AppContext.BaseDirectory, "..", "..", "..", "..",
