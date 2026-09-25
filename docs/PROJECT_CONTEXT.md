@@ -36,7 +36,8 @@ Extra features included for flair:
 - Search by title on the edit/remove screens (`TransactionService.SearchByTitle`),
   case-insensitive substring match, narrowing the paginated list to matching transactions only.
 
-Planned for later (see §9): unit tests, a full colorful UI overhaul, per-user login.
+Planned for later (see §9): unit tests, a full colorful UI overhaul, per-user login, selectable
+currency culture.
 
 ---
 
@@ -412,6 +413,15 @@ package reference to `ConsoleApp` only — `Core` and `Infrastructure` do not ch
 `JsonTransactionRepository` already takes a path, so the change is confined to `Program.cs`:
 prompt for a username, sanitize it against path traversal, build the path, and construct the
 repository. No domain change at all.
+
+**Selectable currency culture.** Let the user choose their own `CultureInfo` from the main menu
+instead of the hardcoded `sv-SE`. `s_currency` is currently duplicated as a private static field
+in `MainMenu`, `TransactionMenu` and `TransactionTable`; this would first need consolidating into
+one shared holder in `UI/` before the formatting calls (`"C0"`/`"N0"`) and the amount prompt
+(deriving `Amount ({currency}): ` from `culture.NumberFormat.CurrencySymbol`) can read from it.
+Amounts are already stored as culture-agnostic `decimal`, so persistence is unaffected; the open
+question is whether the chosen culture should persist across sessions or just live for the
+current run.
 
 ---
 

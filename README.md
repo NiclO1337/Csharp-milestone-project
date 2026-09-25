@@ -279,6 +279,9 @@ Planned, designed for, but not yet implemented:
 - [ ] **User login** (deliberately insecure — no password hashing, this is a learning exercise)
       — one JSON file per user at `data/{username}.json`. The repository already takes a file
       path, so the change is confined to `Program.cs`
+- [ ] **Selectable currency culture** — let the user pick their own `CultureInfo` from the main
+      menu instead of the hardcoded `sv-SE`. Amount prompts would show the derived currency
+      symbol (`Amount ({currency}): `) instead of an implied "kr"
 
 ---
 
