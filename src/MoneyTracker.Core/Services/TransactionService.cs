@@ -31,26 +31,35 @@ public sealed class TransactionService
     public IReadOnlyList<Transaction> GetTransactions(
         TransactionFilter filter = TransactionFilter.All,
         SortField sortBy = SortField.Month,
+        SortDirection direction = SortDirection.Descending) =>
+        Sort(FilterBy(filter), sortBy, direction).ToList();
+
+    /// <summary>
+    /// Returns transactions whose title contains <paramref name="searchTerm"/> (case-insensitive
+    /// substring match), sorted the same way as <see cref="GetTransactions"/>.
+    /// </summary>
+    public IReadOnlyList<Transaction> SearchByTitle(
+        string searchTerm,
+        SortField sortBy = SortField.Month,
         SortDirection direction = SortDirection.Descending)
     {
-        var filtered = FilterBy(filter);
-
-        IOrderedEnumerable<Transaction> sorted = (sortBy, direction) switch
-        {
-            (SortField.Amount, SortDirection.Ascending) => filtered.OrderBy(t => t.SignedAmount),
-            (SortField.Amount, SortDirection.Descending) => filtered.OrderByDescending(t => t.SignedAmount),
-            (SortField.Title, SortDirection.Ascending) => filtered.OrderBy(t => t.Title, StringComparer.CurrentCultureIgnoreCase),
-            (SortField.Title, SortDirection.Descending) => filtered.OrderByDescending(t => t.Title, StringComparer.CurrentCultureIgnoreCase),
-            // ThenByDescending on both branches is deliberate: incomes (positive SignedAmount)
-            // should sort before expenses (negative) within the same month regardless of which
-            // way Month itself is ordered.
-            (_, SortDirection.Ascending) => filtered.OrderBy(t => t.Month).ThenByDescending(t => t.SignedAmount),
-            (_, SortDirection.Descending) => filtered.OrderByDescending(t => t.Month).ThenByDescending(t => t.SignedAmount),
-            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "Unknown sort direction."),
-        };
-
-        return sorted.ToList();
+        var matches = _transactions.Where(t => t.Title.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase));
+        return Sort(matches, sortBy, direction).ToList();
     }
+
+    private static IOrderedEnumerable<Transaction> Sort(IEnumerable<Transaction> transactions, SortField sortBy, SortDirection direction) => (sortBy, direction) switch
+    {
+        (SortField.Amount, SortDirection.Ascending) => transactions.OrderBy(t => t.SignedAmount),
+        (SortField.Amount, SortDirection.Descending) => transactions.OrderByDescending(t => t.SignedAmount),
+        (SortField.Title, SortDirection.Ascending) => transactions.OrderBy(t => t.Title, StringComparer.CurrentCultureIgnoreCase),
+        (SortField.Title, SortDirection.Descending) => transactions.OrderByDescending(t => t.Title, StringComparer.CurrentCultureIgnoreCase),
+        // ThenByDescending on both branches is deliberate: incomes (positive SignedAmount)
+        // should sort before expenses (negative) within the same month regardless of which
+        // way Month itself is ordered.
+        (_, SortDirection.Ascending) => transactions.OrderBy(t => t.Month).ThenByDescending(t => t.SignedAmount),
+        (_, SortDirection.Descending) => transactions.OrderByDescending(t => t.Month).ThenByDescending(t => t.SignedAmount),
+        _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "Unknown sort direction."),
+    };
 
     /// <summary>
     /// Sums <c>SignedAmount</c> across transactions matching <paramref name="filter"/> — the

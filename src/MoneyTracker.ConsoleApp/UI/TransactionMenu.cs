@@ -304,28 +304,51 @@ internal sealed class TransactionMenu
     /// <summary>
     /// Shows a paginated transaction list with an action-specific "Enter Transaction ID to
     /// {actionLabel}" option, shared by <see cref="EditTransaction"/> and
-    /// <see cref="RemoveTransaction"/> so the pagination logic isn't duplicated.
+    /// <see cref="RemoveTransaction"/> so the pagination logic isn't duplicated. Also offers a
+    /// title search that narrows the list to matching transactions, or reports that none matched.
     /// </summary>
     private void ShowTransactionsForAction(string actionLabel, Func<int, bool> action)
     {
         var page = 0;
+        string? searchTerm = null;
 
         while (true)
         {
-            var transactions = _service.GetTransactions(sortBy: SortField.Month, direction: SortDirection.Descending);
+            var transactions = searchTerm is null
+                ? _service.GetTransactions(sortBy: SortField.Month, direction: SortDirection.Descending)
+                : _service.SearchByTitle(searchTerm, SortField.Month, SortDirection.Descending);
             var pageCount = Math.Max(1, (transactions.Count + PageSize - 1) / PageSize);
 
             ConsoleMessage.Heading($"{actionLabel} Transaction");
-            TransactionTable.Display(transactions.Skip(page * PageSize).Take(PageSize).ToList());
+            if (searchTerm is not null)
+            {
+                Console.WriteLine($"Search: \"{searchTerm}\"\n");
+            }
+
+            if (searchTerm is not null && transactions.Count == 0)
+            {
+                ConsoleMessage.DisplayWarningMessage($"No transactions match \"{searchTerm}\".");
+            }
+            else
+            {
+                TransactionTable.Display(transactions.Skip(page * PageSize).Take(PageSize).ToList());
+            }
+
             Console.WriteLine($"\nPage {page + 1} of {pageCount}");
             Console.WriteLine();
 
-            string[] menuItems =
+            List<string> menuItems =
             [
                 "Previous page",
                 "Next page\n",
                 $"Enter Transaction ID to {actionLabel}",
+                searchTerm is null ? "Search by title" : "Change search term",
             ];
+
+            if (searchTerm is not null)
+            {
+                menuItems.Add("Clear search");
+            }
 
             Dictionary<int, string> disabledChoices = [];
             if (page == 0)
@@ -351,9 +374,39 @@ internal sealed class TransactionMenu
                 case 3:
                     PromptIdAndRunAction(actionLabel, action);
                     break;
+                case 4:
+                    searchTerm = PromptSearchTerm(searchTerm);
+                    page = 0;
+                    break;
+                case 5:
+                    searchTerm = null;
+                    page = 0;
+                    break;
                 case 0:
                     return;
             }
+        }
+    }
+
+    /// <summary>
+    /// Prompts for a title search term. Cancelling is caught right here, same as
+    /// <see cref="PromptIdAndRunAction"/>, so it stays on the browsing list with the previous
+    /// search term (if any) instead of propagating up and exiting to the main menu.
+    /// </summary>
+    private static string? PromptSearchTerm(string? currentTerm)
+    {
+        var prompt = currentTerm is null
+            ? "Search by title (enter Q to cancel): "
+            : "Search by title (press Enter to keep current, enter Q to cancel): ";
+
+        try
+        {
+            return ConsoleInput.ValidateInput(prompt, Transaction.MaxTitleLength, allowCancel: true, currentValue: currentTerm);
+        }
+        catch (UserCancelledException)
+        {
+            ConsoleMessage.DisplayWarningMessage("Search cancelled.");
+            return currentTerm;
         }
     }
 

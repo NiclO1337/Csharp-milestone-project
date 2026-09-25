@@ -72,6 +72,7 @@ classDiagram
             -List~Transaction~ _transactions
             -int _nextId
             +GetTransactions(TransactionFilter filter, SortField sortBy, SortDirection direction) IReadOnlyList~Transaction~
+            +SearchByTitle(string searchTerm, SortField sortBy, SortDirection direction) IReadOnlyList~Transaction~
             +GetTotal(TransactionFilter filter) decimal
             +FindById(int id) Transaction
             +GetTransactionsForMonth(YearMonth? month) IReadOnlyList~Transaction~

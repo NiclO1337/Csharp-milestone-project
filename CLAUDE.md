@@ -87,6 +87,8 @@ Invalid console input is a normal event — re-prompt, don't throw.
 - Numbered menus: `Select option (0 - 6): `.
 - Edit prompts show the current value; empty input keeps it.
 - Deleting asks for confirmation and shows the item first.
+- Edit/remove screens support searching by title (`TransactionService.SearchByTitle`,
+  case-insensitive substring match). No matches shows a message instead of an empty table.
 - All colour goes through `ConsoleMessage`, which always calls `Console.ResetColor()`.
 - Currency: `CultureInfo.GetCultureInfo("sv-SE")`, SEK only. Accept `,` and `.` on input.
 

@@ -33,6 +33,8 @@ Extra features included for flair:
 - Amount input accepts both `1234,50` and `1234.50`.
 - Paginated transaction lists (13 rows/page), with filter, sort field and sort direction
   changeable in place.
+- Search by title on the edit/remove screens (`TransactionService.SearchByTitle`),
+  case-insensitive substring match, narrowing the paginated list to matching transactions only.
 
 Planned for later (see §9): unit tests, a full colorful UI overhaul, per-user login.
 
@@ -193,6 +195,11 @@ public IReadOnlyList<Transaction> GetTransactions(
     SortField sortBy = SortField.Month,
     SortDirection direction = SortDirection.Descending);
 
+public IReadOnlyList<Transaction> SearchByTitle(
+    string searchTerm,
+    SortField sortBy = SortField.Month,
+    SortDirection direction = SortDirection.Descending);
+
 public decimal GetTotal(TransactionFilter filter = TransactionFilter.All);
 public Transaction? FindById(int id);
 public IReadOnlyList<Transaction> GetTransactionsForMonth(YearMonth? month = null);
@@ -211,7 +218,12 @@ across restarts and are never reused, even after deletions.
 **Sorting.** Title sorting uses `StringComparer.CurrentCultureIgnoreCase` so that å, ä and ö
 sort where a Swedish user expects them. Sorting by amount uses `SignedAmount`, not `Amount`, so
 the largest expense and the largest income land at opposite ends of the list rather than next to
-each other.
+each other. Both `GetTransactions` and `SearchByTitle` share this ordering logic through a
+private `Sort` helper, so the two never drift apart.
+
+**Search.** `SearchByTitle` matches titles by case-insensitive substring
+(`string.Contains(..., StringComparison.CurrentCultureIgnoreCase)`), not an exact match — the
+edit and remove screens use it to narrow the paginated list to whatever the user typed.
 
 **Returns.** Every read returns `IReadOnlyList<Transaction>`, and the internal `List<Transaction>`
 is never handed out. Callers cannot mutate state behind the service's back.
@@ -318,7 +330,9 @@ Select option (0 - 6):
 `MainMenu` owns only the top-level loop; each of the six options is delegated to
 `TransactionMenu`. "Show transactions" lets the filter, sort field and sort direction be changed
 in place without leaving the screen, and every list (transactions, monthly summary) is paginated
-13 rows at a time. The rendered table:
+13 rows at a time. "Edit transaction" and "Remove transaction" share the same paginated list
+(`ShowTransactionsForAction`) plus a "Search by title" option that narrows it to matching
+transactions, or reports that none matched. The rendered table:
 
 ```
   ID   Type      Title    Month       Year   Amount (SEK)

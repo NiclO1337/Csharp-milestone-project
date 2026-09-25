@@ -44,7 +44,7 @@ than by convention.
 - Record **incomes** and **expenses**, each with a title, amount and month
 - **Sort** by month, amount or title, ascending or descending
 - **Filter** to show only incomes, only expenses, or everything
-- **Edit** and **remove** existing entries
+- **Edit** and **remove** existing entries, with a **search by title** to narrow the list first
 - **Paginated lists** (13 rows/page), with filter, sort field and direction changeable in place
 - **Balance summary** — total income, total expenses and net balance, overall or per month
 - **Autosave** after every add, edit and delete
@@ -95,6 +95,9 @@ The transaction list is paginated, and its filter, sort field and sort direction
 changed in place without leaving the screen:
 
 ![Show Transactions page](docs/show-transactions.png)
+
+The edit and remove screens share this same paginated list, plus a search-by-title option that
+narrows it to matching transactions (or reports that none matched) before picking an ID.
 
 Months are entered as `YYYY-MM`, for example `2026-09`.
 
